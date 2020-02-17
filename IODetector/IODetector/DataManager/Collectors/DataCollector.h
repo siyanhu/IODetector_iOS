@@ -1,5 +1,5 @@
 //
-//  IDUtil.h
+//  DataCollector.h
 //  IODetector
 //
 //  Created by mtrecivy on 17/2/2020.
@@ -7,16 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface IDUtil : NSObject
+@interface DataCollector : NSObject
 
-@property (nonatomic, strong) NSString *user_id;
-@property (nonatomic, strong) NSString *addr;
-@property (nonatomic, strong) NSString *gcoor;
-
-- (BOOL)valid;
+- (void)initEngines:(UIViewController *)vc;
+- (void)startCollection;
+- (void)finishCollection;
 
 @end
 

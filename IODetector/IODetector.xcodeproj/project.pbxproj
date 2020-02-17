@@ -14,6 +14,12 @@
 		9D1CFDF523FACE85007C8F96 /* CellularUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDF423FACE85007C8F96 /* CellularUtil.m */; };
 		9D1CFDF823FACFB9007C8F96 /* SensorUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDF723FACFB9007C8F96 /* SensorUtil.m */; };
 		9D1CFDFB23FAD0FD007C8F96 /* LocationUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDFA23FAD0FD007C8F96 /* LocationUtil.m */; };
+		9D1CFE0223FAD24F007C8F96 /* DataCollector.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFE0123FAD24F007C8F96 /* DataCollector.m */; };
+		9D1CFE0423FAD27B007C8F96 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0323FAD27B007C8F96 /* CoreLocation.framework */; };
+		9D1CFE0623FAD282007C8F96 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0523FAD282007C8F96 /* UIKit.framework */; };
+		9D1CFE0823FAD297007C8F96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0723FAD297007C8F96 /* Foundation.framework */; };
+		9D1CFE0A23FAE0D6007C8F96 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */; };
+		9D1CFE1323FAF4F8007C8F96 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */; };
 		9DE23C4C23FA8DD1006ABDDF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */; };
 		9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4E23FA8DD1006ABDDF /* SceneDelegate.m */; };
 		9DE23C5223FA8DD1006ABDDF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C5123FA8DD1006ABDDF /* ViewController.m */; };
@@ -39,6 +45,14 @@
 		9D1CFDF723FACFB9007C8F96 /* SensorUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SensorUtil.m; sourceTree = "<group>"; };
 		9D1CFDF923FAD0FD007C8F96 /* LocationUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocationUtil.h; sourceTree = "<group>"; };
 		9D1CFDFA23FAD0FD007C8F96 /* LocationUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocationUtil.m; sourceTree = "<group>"; };
+		9D1CFE0023FAD24F007C8F96 /* DataCollector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataCollector.h; sourceTree = "<group>"; };
+		9D1CFE0123FAD24F007C8F96 /* DataCollector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DataCollector.m; sourceTree = "<group>"; };
+		9D1CFE0323FAD27B007C8F96 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		9D1CFE0523FAD282007C8F96 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		9D1CFE0723FAD297007C8F96 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IODetector.entitlements; sourceTree = "<group>"; };
+		9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		9DE23C4723FA8DD1006ABDDF /* IODetector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IODetector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DE23C4A23FA8DD1006ABDDF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -59,7 +73,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D1CFE1323FAF4F8007C8F96 /* ExternalAccessory.framework in Frameworks */,
+				9D1CFE0423FAD27B007C8F96 /* CoreLocation.framework in Frameworks */,
+				9D1CFE0623FAD282007C8F96 /* UIKit.framework in Frameworks */,
+				9D1CFE0A23FAE0D6007C8F96 /* CoreTelephony.framework in Frameworks */,
 				9DE23C6923FA9253006ABDDF /* SystemConfiguration.framework in Frameworks */,
+				9D1CFE0823FAD297007C8F96 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +113,15 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		9D1CFDFC23FAD1EE007C8F96 /* Collectors */ = {
+			isa = PBXGroup;
+			children = (
+				9D1CFE0023FAD24F007C8F96 /* DataCollector.h */,
+				9D1CFE0123FAD24F007C8F96 /* DataCollector.m */,
+			);
+			path = Collectors;
+			sourceTree = "<group>";
+		};
 		9DE23C3E23FA8DD1006ABDDF = {
 			isa = PBXGroup;
 			children = (
@@ -114,6 +142,7 @@
 		9DE23C4923FA8DD1006ABDDF /* IODetector */ = {
 			isa = PBXGroup;
 			children = (
+				9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */,
 				9DE23C6623FA8E0B006ABDDF /* DataManager */,
 				9DE23C4A23FA8DD1006ABDDF /* AppDelegate.h */,
 				9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */,
@@ -133,6 +162,7 @@
 		9DE23C6623FA8E0B006ABDDF /* DataManager */ = {
 			isa = PBXGroup;
 			children = (
+				9D1CFDFC23FAD1EE007C8F96 /* Collectors */,
 				9D1CFDE923FACC92007C8F96 /* Utils */,
 				9D1CFDE523FAC819007C8F96 /* Libs */,
 			);
@@ -142,6 +172,11 @@
 		9DE23C6723FA9252006ABDDF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */,
+				9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */,
+				9D1CFE0723FAD297007C8F96 /* Foundation.framework */,
+				9D1CFE0523FAD282007C8F96 /* UIKit.framework */,
+				9D1CFE0323FAD27B007C8F96 /* CoreLocation.framework */,
 				9DE23C6823FA9253006ABDDF /* SystemConfiguration.framework */,
 			);
 			name = Frameworks;
@@ -228,6 +263,7 @@
 				9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */,
 				9D1CFDF523FACE85007C8F96 /* CellularUtil.m in Sources */,
 				9D1CFDF223FACD80007C8F96 /* WiFiUtil.m in Sources */,
+				9D1CFE0223FAD24F007C8F96 /* DataCollector.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -367,6 +403,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = IODetector/IODetector.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5G4J2HGQG3;
 				INFOPLIST_FILE = IODetector/Info.plist;
@@ -385,6 +422,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = IODetector/IODetector.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5G4J2HGQG3;
 				INFOPLIST_FILE = IODetector/Info.plist;

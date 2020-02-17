@@ -10,4 +10,11 @@
 
 @implementation IDUtil
 
+- (BOOL)valid {
+    if (self.user_id || self.gcoor || self.addr) {
+        return YES;
+    }
+    return NO;
+}
+
 @end

@@ -25,6 +25,7 @@ typedef enum CellularType : NSUInteger {
 # pragma mark - Optional
 @property (nonatomic, strong) NSString *basestation;
 @property (nonatomic, strong) NSString *bsss;
+@property (nonatomic) NSInteger rssi;
 
 @end
 

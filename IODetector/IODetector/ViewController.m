@@ -7,8 +7,11 @@
 //
 
 #import "ViewController.h"
+#import "DataCollector.h"
 
-@interface ViewController ()
+@interface ViewController () {
+    DataCollector *datacollector;
+}
 
 @end
 
@@ -21,7 +24,17 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    datacollector = [[DataCollector alloc]init];
+    [datacollector initEngines:self];
+}
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+}
+
+- (IBAction)startClicked:(id)sender {
+    
+    [datacollector startCollection];
 }
 
 

@@ -24,12 +24,16 @@ typedef enum NetworkType : NSUInteger {
 
 @interface DataUtil : NSObject
 
-@property (nonatomic, strong) IDUtil *idinfo;
+@property (nonatomic) NetworkType type;
 
-@property (nonatomic, strong) LocationUtil *location_data;
-@property (nonatomic, strong) WiFiUtil *wifi_data;
-@property (nonatomic, strong) CellularUtil *cell_data;
-@property (nonatomic, strong) SensorUtil *sensor_data;
+- (IDUtil *)idinfo;
+
+- (LocationUtil *)location_data;
+
+- (WiFiUtil *)wifi_data;
+- (CellularUtil *)cell_data;
+
+- (SensorUtil *)sensor_data;
 
 @end
 
