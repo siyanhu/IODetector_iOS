@@ -13,6 +13,7 @@
 		9D1CFDF223FACD80007C8F96 /* WiFiUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDF123FACD80007C8F96 /* WiFiUtil.m */; };
 		9D1CFDF523FACE85007C8F96 /* CellularUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDF423FACE85007C8F96 /* CellularUtil.m */; };
 		9D1CFDF823FACFB9007C8F96 /* SensorUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDF723FACFB9007C8F96 /* SensorUtil.m */; };
+		9D1CFDFB23FAD0FD007C8F96 /* LocationUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDFA23FAD0FD007C8F96 /* LocationUtil.m */; };
 		9DE23C4C23FA8DD1006ABDDF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */; };
 		9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4E23FA8DD1006ABDDF /* SceneDelegate.m */; };
 		9DE23C5223FA8DD1006ABDDF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C5123FA8DD1006ABDDF /* ViewController.m */; };
@@ -36,6 +37,8 @@
 		9D1CFDF423FACE85007C8F96 /* CellularUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CellularUtil.m; sourceTree = "<group>"; };
 		9D1CFDF623FACFB9007C8F96 /* SensorUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SensorUtil.h; sourceTree = "<group>"; };
 		9D1CFDF723FACFB9007C8F96 /* SensorUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SensorUtil.m; sourceTree = "<group>"; };
+		9D1CFDF923FAD0FD007C8F96 /* LocationUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocationUtil.h; sourceTree = "<group>"; };
+		9D1CFDFA23FAD0FD007C8F96 /* LocationUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocationUtil.m; sourceTree = "<group>"; };
 		9DE23C4723FA8DD1006ABDDF /* IODetector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IODetector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DE23C4A23FA8DD1006ABDDF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -85,6 +88,8 @@
 				9D1CFDF423FACE85007C8F96 /* CellularUtil.m */,
 				9D1CFDF623FACFB9007C8F96 /* SensorUtil.h */,
 				9D1CFDF723FACFB9007C8F96 /* SensorUtil.m */,
+				9D1CFDF923FAD0FD007C8F96 /* LocationUtil.h */,
+				9D1CFDFA23FAD0FD007C8F96 /* LocationUtil.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -217,6 +222,7 @@
 				9D1CFDEF23FACCDB007C8F96 /* IDUtil.m in Sources */,
 				9D1CFDE823FAC82B007C8F96 /* Reachability.m in Sources */,
 				9DE23C5D23FA8DD2006ABDDF /* main.m in Sources */,
+				9D1CFDFB23FAD0FD007C8F96 /* LocationUtil.m in Sources */,
 				9D1CFDEC23FACCA7007C8F96 /* DataUtil.m in Sources */,
 				9D1CFDF823FACFB9007C8F96 /* SensorUtil.m in Sources */,
 				9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */,
