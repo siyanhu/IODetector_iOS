@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "DataCollector.h"
 
-@interface ViewController () {
+@interface ViewController () <DataCollectionDelegate> {
     DataCollector *datacollector;
 }
 
@@ -25,6 +25,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     datacollector = [[DataCollector alloc]init];
+    datacollector.delegate = self;
     [datacollector initEngines:self];
 }
 
@@ -33,8 +34,11 @@
 }
 
 - (IBAction)startClicked:(id)sender {
-    
     [datacollector startCollection];
+//    NSTimer *stopTimer = [NSTimer scheduledTimerWithTimeInterval:10 repeats:NO block:^(NSTimer * _Nonnull timer) {
+//        [datacollector finishCollection];
+//    }];
+    
 }
 
 

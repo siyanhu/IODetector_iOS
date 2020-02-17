@@ -20,6 +20,8 @@
 		9D1CFE0823FAD297007C8F96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0723FAD297007C8F96 /* Foundation.framework */; };
 		9D1CFE0A23FAE0D6007C8F96 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */; };
 		9D1CFE1323FAF4F8007C8F96 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */; };
+		9D8EE0AD23FB066000319CA2 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */; };
+		9D8EE0AF23FB0AAE00319CA2 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */; };
 		9DE23C4C23FA8DD1006ABDDF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */; };
 		9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4E23FA8DD1006ABDDF /* SceneDelegate.m */; };
 		9DE23C5223FA8DD1006ABDDF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C5123FA8DD1006ABDDF /* ViewController.m */; };
@@ -53,6 +55,8 @@
 		9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IODetector.entitlements; sourceTree = "<group>"; };
 		9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
+		9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		9DE23C4723FA8DD1006ABDDF /* IODetector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IODetector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DE23C4A23FA8DD1006ABDDF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -78,7 +82,9 @@
 				9D1CFE0623FAD282007C8F96 /* UIKit.framework in Frameworks */,
 				9D1CFE0A23FAE0D6007C8F96 /* CoreTelephony.framework in Frameworks */,
 				9DE23C6923FA9253006ABDDF /* SystemConfiguration.framework in Frameworks */,
+				9D8EE0AF23FB0AAE00319CA2 /* HealthKit.framework in Frameworks */,
 				9D1CFE0823FAD297007C8F96 /* Foundation.framework in Frameworks */,
+				9D8EE0AD23FB066000319CA2 /* CoreMotion.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +178,8 @@
 		9DE23C6723FA9252006ABDDF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */,
+				9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */,
 				9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */,
 				9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */,
 				9D1CFE0723FAD297007C8F96 /* Foundation.framework */,

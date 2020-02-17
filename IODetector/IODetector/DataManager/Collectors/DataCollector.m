@@ -11,6 +11,8 @@
 
 #import "Reachability.h"
 #import <CoreLocation/CoreLocation.h>
+#import <CoreMotion/CoreMotion.h>
+#import <HealthKit/HealthKit.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
@@ -22,6 +24,9 @@
 @interface DataCollector () <CLLocationManagerDelegate> {
     CLLocationManager *locManager;
     Reachability *reachManager;
+    CMMotionManager *mtManager;
+    CMAltimeter *altManager;
+    HKHealthStore *healthStore;
     
     DataUtil *data_util;
     UIViewController *currentVC;
@@ -36,6 +41,9 @@
     currentVC = vc;
     [self initLocationEngine];
     [self initNetworkEngine];
+    [self initBarometerEngine];
+    [self initMotionEngine];
+    [self initHealthKitEngine];
 }
 
 - (void)startCollection {
@@ -47,10 +55,18 @@
     
     [self startLocationEngine];
     [self startNetworkEngine];
+    [self startBarometerEngine];
+    [self startMotionEngine];
+    [self startHealthKitEngine];
 }
 
 - (void)finishCollection {
+    NSLog(@"Data:%@", data_util);
+    [self.delegate didUpdateData:@""];
     [self endLocationEngine];
+    [self endBarometerEngine];
+    [self endMotionEngine];
+    [self endHealthKitEngine];
     data_util = nil;
 }
 
@@ -330,6 +346,166 @@
     // Free memory
     freeifaddrs(interfaces);
     return address;
+}
+
+#pragma mark - Barometer Engine
+- (void)initBarometerEngine {
+    if (![CMAltimeter isRelativeAltitudeAvailable]) {
+        return;
+    }
+    altManager = [[CMAltimeter alloc]init];
+}
+
+- (void)startBarometerEngine {
+    if (![CMAltimeter isRelativeAltitudeAvailable]) {
+        return;
+    }
+    [altManager startRelativeAltitudeUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMAltitudeData * _Nullable altitudeData, NSError * _Nullable error) {
+        self->data_util.sensor_data.pressure = [altitudeData.pressure floatValue];
+        self->data_util.sensor_data.height = [altitudeData.relativeAltitude floatValue];
+    }];
+}
+
+- (void)endBarometerEngine {
+    if (![CMAltimeter isRelativeAltitudeAvailable]) {
+        return;
+    }
+    [altManager stopRelativeAltitudeUpdates];
+    altManager = nil;
+}
+
+# pragma mark - Motion Engine
+- (void)initMotionEngine {
+    if (!mtManager) {
+        mtManager = [[CMMotionManager alloc]init];
+    }
+    mtManager.magnetometerUpdateInterval = 2;
+}
+
+- (void)startMotionEngine {
+    if (!mtManager.isMagnetometerAvailable) {
+        return;
+    }
+    [mtManager startMagnetometerUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMMagnetometerData * _Nullable magnetometerData, NSError * _Nullable error) {
+        CMMagneticField field = magnetometerData.magneticField;
+        self->data_util.sensor_data.mx = field.x;
+        self->data_util.sensor_data.my = field.y;
+        self->data_util.sensor_data.mz = field.z;
+    }];
+}
+
+- (void)endMotionEngine {
+    if (mtManager.isMagnetometerActive) {
+        [mtManager stopMagnetometerUpdates];
+    }
+}
+
+#pragma mark - HealthKit Engine
+- (void)initHealthKitEngine {
+    if(![HKHealthStore isHealthDataAvailable]) {
+        return;
+    }
+    if (!healthStore) {
+        healthStore = [[HKHealthStore alloc] init];
+    }
+
+}
+
+- (void)startHealthKitEngine {
+    NSSet *healthSet = [NSSet setWithObjects:
+                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount],
+                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned],
+                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning],nil];
+    
+    [healthStore requestAuthorizationToShareTypes:nil readTypes:healthSet completion:^(BOOL success, NSError * _Nullable error) {
+        if (success) {
+            NSLog(@"Can get Step Counter");
+            [self fetchSumOfSamplesTodayForType:[HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount] unit:[HKUnit dayUnit] completion:^(double value, NSError *error) {
+                self->data_util.sensor_data.steps = value;
+                NSLog(@"%@", error.description);
+            }];
+        }
+        else {
+            NSLog(@"Cannot get Step Counter");
+        }
+    }];
+}
+
+- (void)endHealthKitEngine {
+    healthStore = nil;
+}
+
+- (void)readStepCount {
+    //sampling enquiry
+    HKSampleType *sampleType = [HKQuantityType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount];
+    
+    //NSSortDescriptors用来告诉healthStore怎么样将结果排序。
+    NSSortDescriptor *start = [NSSortDescriptor sortDescriptorWithKey:HKSampleSortIdentifierStartDate ascending:NO];
+    NSSortDescriptor *end = [NSSortDescriptor sortDescriptorWithKey:HKSampleSortIdentifierEndDate ascending:NO];
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDate *now = [NSDate date];
+    NSDate *startDate = [calendar startOfDayForDate:now];
+    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:startDate options:0];
+    NSPredicate *pre = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
+
+
+    HKSampleQuery *sampleQuery = [[HKSampleQuery alloc] initWithSampleType:sampleType predicate:pre limit:HKObjectQueryNoLimit sortDescriptors:@[start,end] resultsHandler:^(HKSampleQuery * _Nonnull query, NSArray<__kindof HKSample *> * _Nullable results, NSError * _Nullable error) {
+        NSLog(@"%@",results);
+        double steps = 0;
+
+        for (HKQuantitySample *result in results) {
+            NSLog(@"bundleIdentifier:%@",result.sourceRevision.source.bundleIdentifier);
+            HKQuantity *quantity = result.quantity;
+            HKUnit *heightUnit = [HKUnit countUnit];
+            double usersHeight = [quantity doubleValueForUnit:heightUnit];
+            steps += usersHeight;
+        }
+        
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            self->data_util.sensor_data.steps = steps;
+        }];
+        
+    }];
+    [healthStore executeQuery:sampleQuery];
+}
+
+- (void)getDistancesFromHealthKit {
+    HKQuantityType *stepType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning];
+    [self fetchSumOfSamplesTodayForType:stepType unit:[HKUnit meterUnit] completion:^(double stepCount, NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"Distance：%.f",stepCount);
+            
+        });
+    }];
+}
+
+- (void)fetchSumOfSamplesTodayForType:(HKQuantityType *)quantityType unit:(HKUnit *)unit completion:(void (^)(double, NSError *))completionHandler {
+    NSCalendar *calendar = [NSCalendar currentCalendar];
+    NSDate *now = [NSDate date];
+    NSDate *startDate = [calendar startOfDayForDate:now];
+    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:startDate options:0];
+    NSPredicate *pre = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
+
+    HKStatisticsQuery *query = [[HKStatisticsQuery alloc] initWithQuantityType:quantityType quantitySamplePredicate:pre options:HKStatisticsOptionSeparateBySource completionHandler:^(HKStatisticsQuery *query, HKStatistics *result, NSError *error) {
+        HKQuantity *sum = nil;
+        
+//        NSLog(@"result ==== %@",result.sources);
+        for (HKSource *source in result.sources) {
+            NSLog(@"%@",source.bundleIdentifier);
+//            if ([source.bundleIdentifier containsString:appleHealth]) {
+                sum = [result sumQuantityForSource:source];
+//            }
+        }
+        if (completionHandler) {
+            double value = [sum doubleValueForUnit:unit];
+//            NSLog(@"sum ==== %@",sum);
+//            NSLog(@"value ===%f",value);
+            
+            completionHandler(value, error);
+        }
+    }];
+    
+    [healthStore executeQuery:query];
 }
 
 @end
