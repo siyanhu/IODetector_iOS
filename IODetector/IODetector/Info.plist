@@ -20,6 +20,18 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
+	<string>Health Record would like to be gotten to show people moving status;</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Health Share would like to share the status to internal algorithm.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Health Update would like to get all possible updates in time.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Always and When use approval</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Always use location settings</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>When in use access approval</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -39,6 +51,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -61,13 +78,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>When in use access approval</string>
-	<key>NSHealthClinicalHealthRecordsShareUsageDescription</key>
-	<string>Health Record would like to be gotten to show people moving status;</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Health Share would like to share the status to internal algorithm.</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Health Update would like to get all possible updates in time.</string>
 </dict>
 </plist>

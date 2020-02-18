@@ -6,7 +6,7 @@
 	<true/>
 	<key>com.apple.developer.healthkit.access</key>
 	<array/>
-	<key>com.apple.external-accessory.wireless-configuration</key>
+	<key>com.apple.developer.networking.wifi-info</key>
 	<true/>
 </dict>
 </plist>

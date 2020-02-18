@@ -24,16 +24,18 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     datacollector = [[DataCollector alloc]init];
     datacollector.delegate = self;
     [datacollector initEngines:self];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-}
-
 - (IBAction)startClicked:(id)sender {
+
     [datacollector startCollection];
 //    NSTimer *stopTimer = [NSTimer scheduledTimerWithTimeInterval:10 repeats:NO block:^(NSTimer * _Nonnull timer) {
 //        [datacollector finishCollection];

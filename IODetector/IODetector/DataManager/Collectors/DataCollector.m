@@ -22,6 +22,7 @@
 
 
 @interface DataCollector () <CLLocationManagerDelegate> {
+    NSTimer *redoTimer;
     CLLocationManager *locManager;
     Reachability *reachManager;
     CMMotionManager *mtManager;
@@ -52,15 +53,19 @@
         data_util = [[DataUtil alloc]init];
     }
     data_util.idinfo.user_id = [self phone_App_vendor_ID];
-    
     [self startLocationEngine];
-    [self startNetworkEngine];
-    [self startBarometerEngine];
-    [self startMotionEngine];
-    [self startHealthKitEngine];
+    
+    redoTimer = [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [self startNetworkEngine];
+        [self startBarometerEngine];
+        [self startMotionEngine];
+        [self startHealthKitEngine];
+    }];
+
 }
 
 - (void)finishCollection {
+    [redoTimer invalidate];
     NSLog(@"Data:%@", data_util);
     [self.delegate didUpdateData:@""];
     [self endLocationEngine];
@@ -82,7 +87,7 @@
     if (!locManager) {
         locManager = [[CLLocationManager alloc]init];
         locManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
-//        locManager.allowsBackgroundLocationUpdates = YES;
+        locManager.allowsBackgroundLocationUpdates = YES;
         locManager.headingFilter = 1;
         locManager.delegate = self;
     }
@@ -108,6 +113,14 @@
                 self->data_util.location_data.floor = newLoc.floor.level;
             });
         }
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status {
+    if (status == kCLAuthorizationStatusAuthorizedWhenInUse ||
+        status == kCLAuthorizationStatusAuthorizedAlways) {
+        //再重新获取ssid
+//        self->data_util.wifi_data.ssid = [self WiFiChecking_ios13];
     }
 }
 
@@ -163,14 +176,14 @@
             self->data_util.wifi_data.mac = [wifi_dict valueForKey:@"BSSID"];
             self->data_util.wifi_data.ipaddr = [self getIPAddress];
             self->data_util.wifi_data.timestamp = [[NSDate date] timeIntervalSince1970] * 1000;
-            self->data_util.wifi_data.rssi = [self getSignalStrength:YES] / 5 * 100 * -1;
+            self->data_util.wifi_data.rssi = -1 * (130 - [self getSignalStrength:YES] * 100 / 5);
         } else if (self->reachManager.isReachable == YES) {
             self->data_util.type = NTCellular;
         }
-        if (self->reachManager.isReachableViaWWAN == YES) {
+        if (self->reachManager.isReachable== YES) {
             NSArray *cellularList = [self CellularChecking];
             if (cellularList.count == 3) {
-                self->data_util.cell_data.NSP = [cellularList objectAtIndex:3];
+                self->data_util.cell_data.NSP = [cellularList objectAtIndex:2];
             }
             
             self->data_util.cell_data.rssi = [self getSignalStrength:NO];
@@ -222,13 +235,18 @@
 }
 
 - (NSDictionary *)WiFiChecking {
-    
-    CFArrayRef myArray = CNCopySupportedInterfaces();
-    if (myArray != nil) {
-        CFDictionaryRef myDict = CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(myArray, 0));
-        if (myDict != nil) {
-            NSDictionary *dict = (NSDictionary*)CFBridgingRelease(myDict);
-            return dict;
+    if (@available(iOS 13.0, *)) {
+        [locManager requestWhenInUseAuthorization];
+        
+    }
+    if (locManager) {
+        CFArrayRef myArray = CNCopySupportedInterfaces();
+        if (myArray != nil) {
+            CFDictionaryRef myDict = CNCopyCurrentNetworkInfo(CFArrayGetValueAtIndex(myArray, 0));
+            if (myDict != nil) {
+                NSDictionary *dict = (NSDictionary*)CFBridgingRelease(myDict);
+                return dict;
+            }
         }
     }
     return nil;
@@ -276,6 +294,7 @@
                 signalStrength = signalStrength == 3 ? 4 : signalStrength;
             } else if (cellularEntry && [[cellularEntry valueForKeyPath:@"isEnabled"] boolValue]) {
                 signalStrength = [[cellularEntry valueForKey:@"displayValue"] intValue];
+                NSLog(@"%d", signalStrength);
             }
         }
         return signalStrength;
