@@ -12,7 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface IDUtil : NSObject
 
-@property (nonatomic, strong) NSString *user_id;
+@property (nonatomic, strong) NSNumber *user_id;
+@property (nonatomic, strong) NSString *dev_id;
 @property (nonatomic, strong) NSString *addr;
 @property (nonatomic, strong) NSString *gcoor;
 

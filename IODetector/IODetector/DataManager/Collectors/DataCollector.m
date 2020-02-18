@@ -52,20 +52,21 @@
     if (!data_util) {
         data_util = [[DataUtil alloc]init];
     }
-    data_util.idinfo.user_id = [self phone_App_vendor_ID];
+    data_util.idinfo.user_id = [NSNumber numberWithInt: 2333];
+    data_util.idinfo.dev_id = [self phone_App_vendor_ID];
     [self startLocationEngine];
     
     redoTimer = [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
-        [self startNetworkEngine];
+//        [self startNetworkEngine];
         [self startBarometerEngine];
         [self startMotionEngine];
-        [self startHealthKitEngine];
+//        [self startHealthKitEngine];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self dataChecking]) {
                 NSMutableDictionary *uploadDict = [NSMutableDictionary dictionary];
-                [uploadDict setObject:self->data_util.idinfo.user_id forKey:@"userId"];
-                [uploadDict setObject:self->data_util.idinfo.user_id forKey:@"devId"];
+                [uploadDict setValue:self->data_util.idinfo.user_id forKey:@"userId"];
+                [uploadDict setObject:self->data_util.idinfo.dev_id forKey:@"devId"];
                 [uploadDict setObject:[NSString stringWithFormat:@"%@", self->data_util.idinfo.user_id] forKey:@"dataId"];
                 [uploadDict setValue:[NSNumber numberWithInt:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
                 
@@ -174,11 +175,11 @@
     if (!data_util) {
         return NO;
     }
-    if (data_util.idinfo) {
-        if (!data_util.idinfo.user_id) {
-            return NO;
-        }
-    }
+//    if (data_util.idinfo) {
+//        if (!data_util.idinfo.user_id) {
+//            return NO;
+//        }
+//    }
     if (data_util.location_data) {
         if (data_util.location_data.x == 0 || data_util.location_data.y == 0) {
             return NO;
@@ -406,11 +407,11 @@
     int signalStrength = 0;
     if (@available(iOS 13.0, *)) {
         UIStatusBarManager *statusBarManager = [UIApplication sharedApplication].keyWindow.windowScene.statusBarManager;
-        if ([statusBarManager respondsToSelector:@selector(createLocalStatusBar)]) {
-            UIView *localStatusBar = [statusBarManager performSelector:@selector(createLocalStatusBar)];
+//        if ([statusBarManager respondsToSelector:@selector(createLocalStatusBar)]) {
+            id localStatusBar = [statusBarManager performSelector:@selector(createLocalStatusBar)];
             if ([localStatusBar respondsToSelector:@selector(statusBar)]) {
                 statusBar = [localStatusBar performSelector:@selector(statusBar)];
-            }
+//            }
         }
         if (statusBar) {
             id currentData = [[statusBar valueForKeyPath:@"_statusBar"] valueForKeyPath:@"currentData"];
@@ -562,13 +563,13 @@
                         [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount],
                         [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned],
                         [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning],nil];
-    
     [healthStore requestAuthorizationToShareTypes:nil readTypes:healthSet completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
 //            NSLog(@"Can get Step Counter");
             [self fetchSumOfSamplesTodayForType:[HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount] unit:[HKUnit dayUnit] completion:^(double value, NSError *error) {
                 self->data_util.sensor_data.steps = value;
                 NSLog(@"%@", error.description);
+                [self startNetworkEngine];
             }];
         }
         else {

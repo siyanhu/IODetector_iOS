@@ -56,7 +56,7 @@
 - (IBAction)queryClicked:(id)sender {
     NSString *id_str = [datacollector phone_App_vendor_ID];
     NSDictionary *paras = [NSDictionary dictionaryWithObjectsAndKeys:
-                           id_str, @"userId",
+                           [NSNumber numberWithInt:2333], @"userId",
                            id_str, @"devId",
                            nil];
     [[RemoteAccess instance]readFrom:@"http://143.89.145.220:8080/quarloc/client/stateQuery" withParameters:paras success:^(NSData * _Nonnull remoteData) {
