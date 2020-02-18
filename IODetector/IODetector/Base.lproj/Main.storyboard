@@ -16,24 +16,67 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4GX-q5-5rd">
-                                <rect key="frame" x="20" y="792" width="374" height="50"/>
+                                <rect key="frame" x="20" y="104" width="374" height="50"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="50" id="0T1-g3-kmx"/>
+                                    <constraint firstAttribute="height" constant="50" id="Udb-3S-xKd"/>
                                 </constraints>
-                                <state key="normal" title="Start Collecting"/>
+                                <state key="normal" title="Start Collecting">
+                                    <color key="titleColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
                                 <connections>
                                     <action selector="startClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="fEz-Br-AbG"/>
                                 </connections>
                             </button>
+                            <button hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sUn-ag-CuA">
+                                <rect key="frame" x="20" y="184" width="374" height="50"/>
+                                <state key="normal" title="Query">
+                                    <color key="titleColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="queryClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="wlA-IO-mSs"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pqy-hI-7NC">
+                                <rect key="frame" x="20" y="264" width="374" height="50"/>
+                                <state key="normal" title="End Collecting">
+                                    <color key="titleColor" systemColor="systemGreenColor" red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="endClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="CLX-3K-1hi"/>
+                                </connections>
+                            </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" directionalLockEnabled="YES" showsHorizontalScrollIndicator="NO" bouncesZoom="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uUO-T1-a8q">
+                                <rect key="frame" x="20" y="344" width="374" height="458"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="4GX-q5-5rd" secondAttribute="bottom" constant="20" id="Hvw-9t-GiM"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="4GX-q5-5rd" secondAttribute="trailing" constant="20" id="OUf-mk-NX3"/>
-                            <constraint firstItem="4GX-q5-5rd" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="UOd-sE-VAP"/>
+                            <constraint firstItem="uUO-T1-a8q" firstAttribute="trailing" secondItem="4GX-q5-5rd" secondAttribute="trailing" id="2n0-dk-1oH"/>
+                            <constraint firstItem="uUO-T1-a8q" firstAttribute="leading" secondItem="4GX-q5-5rd" secondAttribute="leading" id="5ge-oS-kXC"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="4GX-q5-5rd" secondAttribute="trailing" constant="20" id="69n-AP-IH9"/>
+                            <constraint firstItem="pqy-hI-7NC" firstAttribute="height" secondItem="4GX-q5-5rd" secondAttribute="height" id="Do9-7P-xdG"/>
+                            <constraint firstItem="4GX-q5-5rd" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="60" id="FaF-XL-HW1"/>
+                            <constraint firstItem="pqy-hI-7NC" firstAttribute="trailing" secondItem="4GX-q5-5rd" secondAttribute="trailing" id="HXz-60-ePJ"/>
+                            <constraint firstItem="pqy-hI-7NC" firstAttribute="leading" secondItem="4GX-q5-5rd" secondAttribute="leading" id="IzG-2R-NZs"/>
+                            <constraint firstItem="uUO-T1-a8q" firstAttribute="top" secondItem="pqy-hI-7NC" secondAttribute="bottom" constant="30" id="JVC-t2-wNd"/>
+                            <constraint firstItem="sUn-ag-CuA" firstAttribute="height" secondItem="4GX-q5-5rd" secondAttribute="height" id="Qbh-7o-CKG"/>
+                            <constraint firstItem="4GX-q5-5rd" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="SWp-BD-i8e"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="uUO-T1-a8q" secondAttribute="bottom" constant="60" id="Yoa-Cw-jZ8"/>
+                            <constraint firstItem="pqy-hI-7NC" firstAttribute="top" secondItem="sUn-ag-CuA" secondAttribute="bottom" constant="30" id="blR-jo-MLs"/>
+                            <constraint firstItem="sUn-ag-CuA" firstAttribute="top" secondItem="4GX-q5-5rd" secondAttribute="bottom" constant="30" id="ctf-we-Rcj"/>
+                            <constraint firstItem="sUn-ag-CuA" firstAttribute="leading" secondItem="4GX-q5-5rd" secondAttribute="leading" id="mtW-Qv-uhf"/>
+                            <constraint firstItem="sUn-ag-CuA" firstAttribute="trailing" secondItem="4GX-q5-5rd" secondAttribute="trailing" id="ttg-aj-4XG"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="detailLabel" destination="uUO-T1-a8q" id="IvP-iH-rwD"/>
+                        <outlet property="queryButton" destination="sUn-ag-CuA" id="8Qj-Tp-8Id"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

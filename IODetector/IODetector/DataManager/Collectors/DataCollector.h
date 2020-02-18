@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol DataCollectionDelegate <NSObject>
 @optional
 
-- (void)didUpdateData:(NSString *)dataString;
+- (void)didUpdateData:(NSDictionary *)dataDict;
 
 @end
 
@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DataCollector : NSObject
 
 @property (nonatomic, strong) id <DataCollectionDelegate> delegate;
+
+- (NSString *)phone_App_vendor_ID;
 
 - (void)initEngines:(UIViewController *)vc;
 - (void)startCollection;

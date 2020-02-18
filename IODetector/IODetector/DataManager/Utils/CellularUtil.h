@@ -21,6 +21,7 @@ typedef enum CellularType : NSUInteger {
 # pragma mark - Required
 @property (nonatomic, strong) NSString *NSP;
 @property (nonatomic) CellularType type;
+@property (nonatomic) NSInteger cid;
 
 # pragma mark - Optional
 @property (nonatomic, strong) NSString *basestation;

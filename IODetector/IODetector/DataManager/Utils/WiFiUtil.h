@@ -23,7 +23,7 @@ typedef enum WiFiType : NSUInteger {
 @property (nonatomic) WiFiType type;
 
 # pragma mark - Connected
-@property (nonatomic) long long timestamp;
+@property (nonatomic) int timestamp;
 @property (nonatomic, strong) NSString *ipaddr;
 
 # pragma mark - Optional

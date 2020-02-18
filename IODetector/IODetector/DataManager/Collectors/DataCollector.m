@@ -60,19 +60,144 @@
         [self startBarometerEngine];
         [self startMotionEngine];
         [self startHealthKitEngine];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([self dataChecking]) {
+                NSMutableDictionary *uploadDict = [NSMutableDictionary dictionary];
+                [uploadDict setObject:self->data_util.idinfo.user_id forKey:@"userId"];
+                [uploadDict setObject:self->data_util.idinfo.user_id forKey:@"devId"];
+                [uploadDict setObject:[NSString stringWithFormat:@"%@", self->data_util.idinfo.user_id] forKey:@"dataId"];
+                [uploadDict setValue:[NSNumber numberWithInt:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
+                
+                NSDictionary *geoloc = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        @"CoreLocation", @"src",
+                                        [NSNumber numberWithFloat:self->data_util.location_data.y], @"latitude",
+                                        [NSNumber numberWithFloat:self->data_util.location_data.x], @"longitude",
+                                        [NSNumber numberWithFloat:self->data_util.location_data.floor], @"altitude",
+                                        [NSNumber numberWithFloat:0.0], @"accuracy",
+                                        nil];
+                NSDictionary *wlan;
+                if (self->data_util.wifi_data) {
+                    wlan = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:YES], @"connection",
+                            self->data_util.wifi_data.ipaddr, @"ip",
+                            self->data_util.wifi_data.ssid, @"ssid",
+                            self->data_util.wifi_data.mac, @"bssid",
+                            [NSNumber numberWithInteger: self->data_util.wifi_data.rssi], @"rssi",
+                            [NSNumber numberWithInteger: 3600], @"duration",
+                            nil];
+                } else {
+                    wlan = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:NO], @"connection",
+                            @"", @"ip",
+                            @"", @"ssid",
+                            @"", @"bssid",
+                            [NSNumber numberWithInteger: 0], @"rssi",
+                            [NSNumber numberWithInteger: 0], @"duration",
+                            nil];
+                }
+                
+                NSDictionary *cellular;
+                if (self->data_util.cell_data) {
+                    cellular = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:YES], @"connection",
+                            [NSNumber numberWithInteger:1], @"mcc",
+                            [NSNumber numberWithInteger:2], @"mnc",
+                            [NSNumber numberWithInteger:3], @"lac",
+                            [NSNumber numberWithInteger: self->data_util.cell_data.cid], @"cid",
+                            [NSNumber numberWithInteger: self->data_util.cell_data.rssi], @"ss",
+                            [NSNumber numberWithUnsignedInteger:self->data_util.cell_data.type], @"type",
+                            nil];
+                } else {
+                    cellular = [NSDictionary dictionaryWithObjectsAndKeys:
+                            [NSNumber numberWithBool:YES], @"connection",
+                            [NSNumber numberWithInteger:1], @"mcc",
+                            [NSNumber numberWithInteger:2], @"mnc",
+                            [NSNumber numberWithInteger:3], @"lac",
+                            [NSNumber numberWithInteger:4], @"cid",
+                            [NSNumber numberWithInteger:-100], @"ss",
+                            [NSNumber numberWithInteger:1], @"type",
+                            nil];
+                    
+                }
+                
+                NSDictionary *nearbyWLAN = [NSDictionary dictionaryWithObjectsAndKeys:
+                                            self->data_util.wifi_data.ssid, @"ssid",
+                                            self->data_util.wifi_data.mac, @"bssid",
+                                            [NSNumber numberWithInteger: self->data_util.wifi_data.rssi], @"rssi",
+                                            nil];
+                NSDictionary *nearbyWLANs = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [NSArray arrayWithObjects:nearbyWLAN, nil], @"list",
+                                             nil];
+                NSDictionary *nearbyMags = [NSDictionary dictionaryWithObjectsAndKeys:
+                                            [NSArray arrayWithObjects:
+                                             [NSNumber numberWithFloat:self->data_util.sensor_data.mx], [NSNumber numberWithFloat:self->data_util.sensor_data.my], [NSNumber numberWithFloat:self->data_util.sensor_data.mz], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], nil], @"values",
+                                            nil];
+                NSDictionary *nearbyBaros = [NSDictionary dictionaryWithObjectsAndKeys:
+                                             [NSArray arrayWithObjects:[NSNumber numberWithFloat:self->data_util.sensor_data.pressure], [NSNumber numberWithFloat:self->data_util.sensor_data.height], nil], @"values",
+                                             nil];
+                NSDictionary *nearby = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        nearbyWLANs, @"wlan",
+                                        nearbyMags, @"magnetic",
+                                        nearbyBaros, @"baro",
+                                        nil];
+                
+                NSDictionary *activity = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:self->data_util.sensor_data.steps], @"step", nil], @"activity"
+                                          , nil];
+                
+                NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      geoloc, @"geoloc",
+                                      wlan, @"wlan",
+                                      cellular, @"cellular",
+                                      nearby, @"nearby",
+                                      activity, @"activity",
+                                      nil];
+                [uploadDict setObject:data forKey:@"data"];
+                [self.delegate didUpdateData:uploadDict];
+            }
+        });
     }];
 
 }
 
 - (void)finishCollection {
     [redoTimer invalidate];
-    NSLog(@"Data:%@", data_util);
-    [self.delegate didUpdateData:@""];
     [self endLocationEngine];
     [self endBarometerEngine];
     [self endMotionEngine];
     [self endHealthKitEngine];
-    data_util = nil;
+//    data_util = nil;
+}
+
+- (BOOL)dataChecking {
+    if (!data_util) {
+        return NO;
+    }
+    if (data_util.idinfo) {
+        if (!data_util.idinfo.user_id) {
+            return NO;
+        }
+    }
+    if (data_util.location_data) {
+        if (data_util.location_data.x == 0 || data_util.location_data.y == 0) {
+            return NO;
+        }
+    }
+    BOOL networkValid = NO;
+    if (data_util.wifi_data) {
+        networkValid = YES;
+    }
+    if (data_util.cell_data) {
+        networkValid = YES;
+    }
+    if (!networkValid) {
+        return NO;
+    }
+    if (!data_util.sensor_data) {
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark - Device Indetification
@@ -175,18 +300,19 @@
             }
             self->data_util.wifi_data.mac = [wifi_dict valueForKey:@"BSSID"];
             self->data_util.wifi_data.ipaddr = [self getIPAddress];
-            self->data_util.wifi_data.timestamp = [[NSDate date] timeIntervalSince1970] * 1000;
+            self->data_util.wifi_data.timestamp = [[NSDate date] timeIntervalSince1970];
             self->data_util.wifi_data.rssi = -1 * (130 - [self getSignalStrength:YES] * 100 / 5);
         } else if (self->reachManager.isReachable == YES) {
             self->data_util.type = NTCellular;
         }
         if (self->reachManager.isReachable== YES) {
             NSArray *cellularList = [self CellularChecking];
-            if (cellularList.count == 3) {
-                self->data_util.cell_data.NSP = [cellularList objectAtIndex:2];
+            if (cellularList.count == 4) {
+                self->data_util.cell_data.NSP = [cellularList objectAtIndex:3];
+                self->data_util.cell_data.cid = [[cellularList objectAtIndex:0] integerValue];
             }
-            
             self->data_util.cell_data.rssi = [self getSignalStrength:NO];
+
         }
         if (self->reachManager.isReachable == NO) {
             self->data_util.type = NTNone;
@@ -267,9 +393,10 @@
     }
     NSString *CountryCode = carrier.isoCountryCode;
     NSString *NetworkCode = carrier.mobileNetworkCode;
+    NSString *NetworkCountryCode = carrier.mobileCountryCode;
     NSString *CarrierName = [[NSString stringWithFormat:@"%@" ,carrier.carrierName] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 //    NSString *CellularService = networkInfo.serviceCurrentRadioAccessTechnology;
-    NSArray *carrierArray = [NSArray arrayWithObjects:CountryCode, NetworkCode, CarrierName, nil];
+    NSArray *carrierArray = [NSArray arrayWithObjects:NetworkCountryCode, CountryCode, NetworkCode, CarrierName, nil];
     return carrierArray;
 }
 
@@ -438,7 +565,7 @@
     
     [healthStore requestAuthorizationToShareTypes:nil readTypes:healthSet completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
-            NSLog(@"Can get Step Counter");
+//            NSLog(@"Can get Step Counter");
             [self fetchSumOfSamplesTodayForType:[HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount] unit:[HKUnit dayUnit] completion:^(double value, NSError *error) {
                 self->data_util.sensor_data.steps = value;
                 NSLog(@"%@", error.description);
@@ -510,7 +637,7 @@
         
 //        NSLog(@"result ==== %@",result.sources);
         for (HKSource *source in result.sources) {
-            NSLog(@"%@",source.bundleIdentifier);
+//            NSLog(@"%@",source.bundleIdentifier);
 //            if ([source.bundleIdentifier containsString:appleHealth]) {
                 sum = [result sumQuantityForSource:source];
 //            }

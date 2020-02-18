@@ -22,6 +22,7 @@
 		9D1CFE1323FAF4F8007C8F96 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */; };
 		9D8EE0AD23FB066000319CA2 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */; };
 		9D8EE0AF23FB0AAE00319CA2 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */; };
+		9D8EE0B423FB95CD00319CA2 /* RemoteAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D8EE0B223FB95CD00319CA2 /* RemoteAccess.m */; };
 		9DE23C4C23FA8DD1006ABDDF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */; };
 		9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C4E23FA8DD1006ABDDF /* SceneDelegate.m */; };
 		9DE23C5223FA8DD1006ABDDF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9DE23C5123FA8DD1006ABDDF /* ViewController.m */; };
@@ -57,6 +58,8 @@
 		9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
 		9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		9D8EE0B223FB95CD00319CA2 /* RemoteAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteAccess.m; sourceTree = "<group>"; };
+		9D8EE0B323FB95CD00319CA2 /* RemoteAccess.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteAccess.h; sourceTree = "<group>"; };
 		9DE23C4723FA8DD1006ABDDF /* IODetector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IODetector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9DE23C4A23FA8DD1006ABDDF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -128,6 +131,23 @@
 			path = Collectors;
 			sourceTree = "<group>";
 		};
+		9D8EE0B023FB958900319CA2 /* NetworkManager */ = {
+			isa = PBXGroup;
+			children = (
+				9D8EE0B123FB95CD00319CA2 /* RemoteConnection */,
+			);
+			path = NetworkManager;
+			sourceTree = "<group>";
+		};
+		9D8EE0B123FB95CD00319CA2 /* RemoteConnection */ = {
+			isa = PBXGroup;
+			children = (
+				9D8EE0B323FB95CD00319CA2 /* RemoteAccess.h */,
+				9D8EE0B223FB95CD00319CA2 /* RemoteAccess.m */,
+			);
+			path = RemoteConnection;
+			sourceTree = "<group>";
+		};
 		9DE23C3E23FA8DD1006ABDDF = {
 			isa = PBXGroup;
 			children = (
@@ -148,7 +168,7 @@
 		9DE23C4923FA8DD1006ABDDF /* IODetector */ = {
 			isa = PBXGroup;
 			children = (
-				9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */,
+				9D8EE0B023FB958900319CA2 /* NetworkManager */,
 				9DE23C6623FA8E0B006ABDDF /* DataManager */,
 				9DE23C4A23FA8DD1006ABDDF /* AppDelegate.h */,
 				9DE23C4B23FA8DD1006ABDDF /* AppDelegate.m */,
@@ -161,6 +181,7 @@
 				9DE23C5823FA8DD2006ABDDF /* LaunchScreen.storyboard */,
 				9DE23C5B23FA8DD2006ABDDF /* Info.plist */,
 				9DE23C5C23FA8DD2006ABDDF /* main.m */,
+				9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */,
 			);
 			path = IODetector;
 			sourceTree = "<group>";
@@ -267,6 +288,7 @@
 				9DE23C5D23FA8DD2006ABDDF /* main.m in Sources */,
 				9D1CFDFB23FAD0FD007C8F96 /* LocationUtil.m in Sources */,
 				9D1CFDEC23FACCA7007C8F96 /* DataUtil.m in Sources */,
+				9D8EE0B423FB95CD00319CA2 /* RemoteAccess.m in Sources */,
 				9D1CFDF823FACFB9007C8F96 /* SensorUtil.m in Sources */,
 				9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */,
 				9D1CFDF523FACE85007C8F96 /* CellularUtil.m in Sources */,
