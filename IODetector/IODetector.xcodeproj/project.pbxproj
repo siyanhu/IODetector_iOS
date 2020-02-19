@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9D0158D623FCFD4E003AE4E5 /* ThreadSafeMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D0158D423FCFD4E003AE4E5 /* ThreadSafeMutableArray.m */; };
 		9D1CFDE823FAC82B007C8F96 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDE723FAC82B007C8F96 /* Reachability.m */; };
 		9D1CFDEC23FACCA7007C8F96 /* DataUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDEB23FACCA7007C8F96 /* DataUtil.m */; };
 		9D1CFDEF23FACCDB007C8F96 /* IDUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D1CFDEE23FACCDB007C8F96 /* IDUtil.m */; };
@@ -34,6 +35,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9D0158D423FCFD4E003AE4E5 /* ThreadSafeMutableArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadSafeMutableArray.m; sourceTree = "<group>"; };
+		9D0158D523FCFD4E003AE4E5 /* ThreadSafeMutableArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreadSafeMutableArray.h; sourceTree = "<group>"; };
 		9D1CFDE623FAC82B007C8F96 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		9D1CFDE723FAC82B007C8F96 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		9D1CFDEA23FACCA7007C8F96 /* DataUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataUtil.h; sourceTree = "<group>"; };
@@ -97,6 +100,8 @@
 		9D1CFDE523FAC819007C8F96 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				9D0158D523FCFD4E003AE4E5 /* ThreadSafeMutableArray.h */,
+				9D0158D423FCFD4E003AE4E5 /* ThreadSafeMutableArray.m */,
 				9D1CFDE623FAC82B007C8F96 /* Reachability.h */,
 				9D1CFDE723FAC82B007C8F96 /* Reachability.m */,
 			);
@@ -292,6 +297,7 @@
 				9D1CFDF823FACFB9007C8F96 /* SensorUtil.m in Sources */,
 				9DE23C4F23FA8DD1006ABDDF /* SceneDelegate.m in Sources */,
 				9D1CFDF523FACE85007C8F96 /* CellularUtil.m in Sources */,
+				9D0158D623FCFD4E003AE4E5 /* ThreadSafeMutableArray.m in Sources */,
 				9D1CFDF223FACD80007C8F96 /* WiFiUtil.m in Sources */,
 				9D1CFE0223FAD24F007C8F96 /* DataCollector.m in Sources */,
 			);

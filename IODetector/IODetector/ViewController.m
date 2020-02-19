@@ -100,7 +100,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error = nil;
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        if (error) {
+    if (error) {
             NSLog(@"Parse Error: %@", error.description);
         } else{
             NSString *preText = self.detailLabel.text;
@@ -112,6 +112,7 @@
 #pragma mark - Delegate
 - (void)didUpdateData:(NSDictionary *)dataDict {
     if (dataDict) {
+//        NSLog(@"%@", dataDict);
         [self uploadData:dataDict];
     }
 }

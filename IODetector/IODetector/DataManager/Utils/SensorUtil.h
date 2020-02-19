@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 # pragma mark - Magnetometer
 @property (nonatomic) float mx, my, mz;
+@property (nonatomic) float total;
 
 # pragma mark - HealthKit
 @property (nonatomic) NSInteger steps;

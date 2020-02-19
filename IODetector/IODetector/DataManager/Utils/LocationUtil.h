@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) float x, y;
 @property (nonatomic) NSInteger floor; //default -1, means no floor data;
+@property (nonatomic) int haccuracy;
 
 @end
 

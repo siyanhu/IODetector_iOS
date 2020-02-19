@@ -10,19 +10,22 @@
 #import "DataUtil.h"
 
 #import "Reachability.h"
-#import <CoreLocation/CoreLocation.h>
-#import <CoreMotion/CoreMotion.h>
-#import <HealthKit/HealthKit.h>
+#import "ThreadSafeMutableArray.h"
+
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <SystemConfiguration/SystemConfiguration.h>
+#import <CoreLocation/CoreLocation.h>
+#import <CoreMotion/CoreMotion.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
+#import <HealthKit/HealthKit.h>
+
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 
 
 @interface DataCollector () <CLLocationManagerDelegate> {
-    NSTimer *redoTimer;
+    NSTimer *redoTimer, *uploadTimer;
     CLLocationManager *locManager;
     Reachability *reachManager;
     CMMotionManager *mtManager;
@@ -31,6 +34,8 @@
     
     DataUtil *data_util;
     UIViewController *currentVC;
+    ThreadSafeMutableArray *magCache, *baroCache;
+    dispatch_queue_t threadsafe_queue;
 }
 
 @end
@@ -40,6 +45,7 @@
 # pragma mark - Public Functions
 - (void)initEngines:(UIViewController *)vc {
     currentVC = vc;
+    threadsafe_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     [self initLocationEngine];
     [self initNetworkEngine];
     [self initBarometerEngine];
@@ -48,7 +54,7 @@
 }
 
 - (void)startCollection {
-    
+
     if (!data_util) {
         data_util = [[DataUtil alloc]init];
     }
@@ -56,26 +62,30 @@
     data_util.idinfo.dev_id = [self phone_App_vendor_ID];
     [self startLocationEngine];
     
-    redoTimer = [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
-//        [self startNetworkEngine];
+    redoTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [self startNetworkEngine];
         [self startBarometerEngine];
         [self startMotionEngine];
-//        [self startHealthKitEngine];
+        [self startHealthKitEngine];
+    }];
+    
+    
+    uploadTimer = [NSTimer scheduledTimerWithTimeInterval:5 repeats:YES block:^(NSTimer * _Nonnull timer) {
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self dataChecking]) {
                 NSMutableDictionary *uploadDict = [NSMutableDictionary dictionary];
-                [uploadDict setValue:self->data_util.idinfo.user_id forKey:@"userId"];
+                [uploadDict setValue:[NSNumber numberWithInteger:54287123] forKey:@"userId"];
                 [uploadDict setObject:self->data_util.idinfo.dev_id forKey:@"devId"];
-                [uploadDict setObject:[NSString stringWithFormat:@"%@", self->data_util.idinfo.user_id] forKey:@"dataId"];
+                [uploadDict setObject:[NSString stringWithFormat:@"%@_%@", [NSNumber numberWithInteger:54287123], [self getDataId]] forKey:@"dataId"];
                 [uploadDict setValue:[NSNumber numberWithInt:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
                 
                 NSDictionary *geoloc = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        @"CoreLocation", @"src",
+                                        @"apple", @"src",
                                         [NSNumber numberWithFloat:self->data_util.location_data.y], @"latitude",
                                         [NSNumber numberWithFloat:self->data_util.location_data.x], @"longitude",
                                         [NSNumber numberWithFloat:self->data_util.location_data.floor], @"altitude",
-                                        [NSNumber numberWithFloat:0.0], @"accuracy",
+                                        [NSNumber numberWithInt:self->data_util.location_data.haccuracy], @"accuracy",
                                         nil];
                 NSDictionary *wlan;
                 if (self->data_util.wifi_data) {
@@ -102,12 +112,12 @@
                 if (self->data_util.cell_data) {
                     cellular = [NSDictionary dictionaryWithObjectsAndKeys:
                             [NSNumber numberWithBool:YES], @"connection",
-                            [NSNumber numberWithInteger:1], @"mcc",
-                            [NSNumber numberWithInteger:2], @"mnc",
-                            [NSNumber numberWithInteger:3], @"lac",
-                            [NSNumber numberWithInteger: self->data_util.cell_data.cid], @"cid",
+                            [NSNumber numberWithInteger:self->data_util.cell_data.mcc.integerValue], @"mcc",
+                            [NSNumber numberWithInteger:self->data_util.cell_data.mnc.integerValue], @"mnc",
+//                            [NSNumber numberWithInteger:3], @"lac",
+//                            [NSNumber numberWithInteger: self->data_util.cell_data.cid], @"cid",
                             [NSNumber numberWithInteger: self->data_util.cell_data.rssi], @"ss",
-                            [NSNumber numberWithUnsignedInteger:self->data_util.cell_data.type], @"type",
+                            self->data_util.cell_data.type, @"type",
                             nil];
                 } else {
                     cellular = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -130,13 +140,18 @@
                 NSDictionary *nearbyWLANs = [NSDictionary dictionaryWithObjectsAndKeys:
                                              [NSArray arrayWithObjects:nearbyWLAN, nil], @"list",
                                              nil];
+//                NSDictionary *nearbyMags = [NSDictionary dictionaryWithObjectsAndKeys:
+//                                            [NSArray arrayWithObjects:
+//                                             [NSNumber numberWithFloat:self->data_util.sensor_data.mx], [NSNumber numberWithFloat:self->data_util.sensor_data.my], [NSNumber numberWithFloat:self->data_util.sensor_data.mz], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], nil], @"values",
+//                                            nil];
                 NSDictionary *nearbyMags = [NSDictionary dictionaryWithObjectsAndKeys:
-                                            [NSArray arrayWithObjects:
-                                             [NSNumber numberWithFloat:self->data_util.sensor_data.mx], [NSNumber numberWithFloat:self->data_util.sensor_data.my], [NSNumber numberWithFloat:self->data_util.sensor_data.mz], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], nil], @"values",
-                                            nil];
+                                            [NSArray arrayWithArray:self->magCache], @"values",
+                                                nil];
+                [self magRemoveObject:nil];
                 NSDictionary *nearbyBaros = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             [NSArray arrayWithObjects:[NSNumber numberWithFloat:self->data_util.sensor_data.pressure], [NSNumber numberWithFloat:self->data_util.sensor_data.height], nil], @"values",
+                                             [NSArray arrayWithArray:self->baroCache], @"values",
                                              nil];
+                [self baroRemoveObject:nil];
                 NSDictionary *nearby = [NSDictionary dictionaryWithObjectsAndKeys:
                                         nearbyWLANs, @"wlan",
                                         nearbyMags, @"magnetic",
@@ -163,6 +178,7 @@
 }
 
 - (void)finishCollection {
+    [uploadTimer invalidate];
     [redoTimer invalidate];
     [self endLocationEngine];
     [self endBarometerEngine];
@@ -208,6 +224,21 @@
     return strIDFV;
 }
 
+- (NSString *)getDataId {
+    NSDate *date = [NSDate date];
+
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+
+    [formatter setDateStyle:NSDateFormatterMediumStyle];
+
+    [formatter setTimeStyle:NSDateFormatterShortStyle];
+
+    [formatter setDateFormat:@"YYYY-MM-dd-hh-mm-ss"];
+
+    NSString *DateTime = [formatter stringFromDate:date];
+    return DateTime;
+}
+
 #pragma mark - Location Engine
 - (void)initLocationEngine {
     if (!locManager) {
@@ -222,10 +253,12 @@
 
 - (void)startLocationEngine {
     [locManager startUpdatingLocation];
+    [locManager startUpdatingHeading];
 }
 
 - (void)endLocationEngine {
     [locManager stopUpdatingLocation];
+    [locManager stopUpdatingHeading];
     locManager = nil;
 }
 
@@ -237,6 +270,7 @@
                 self->data_util.location_data.x = newLoc.coordinate.longitude;
                 self->data_util.location_data.y = newLoc.coordinate.latitude;
                 self->data_util.location_data.floor = newLoc.floor.level;
+                self->data_util.location_data.haccuracy = newLoc.horizontalAccuracy;
             });
         }
     }
@@ -248,6 +282,12 @@
         //再重新获取ssid
 //        self->data_util.wifi_data.ssid = [self WiFiChecking_ios13];
     }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading {
+    dispatch_async(dispatch_get_main_queue(), ^{
+//        [self->headings addObject:[NSNumber numberWithFloat:newHeading.magneticHeading]];
+    });
 }
 
 - (void)locationAccess:(UIViewController *)vc {
@@ -289,8 +329,10 @@
 }
 
 - (void)startNetworkEngine {
-    
+//    [self->reachManager startNotifier];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
+        
         if (self->reachManager.isReachableViaWiFi) {
             
             NSDictionary *wifi_dict = [self WiFiChecking];
@@ -308,20 +350,39 @@
         }
         if (self->reachManager.isReachable== YES) {
             NSArray *cellularList = [self CellularChecking];
-            if (cellularList.count == 4) {
+            if (cellularList.count == 5) {
+                self->data_util.cell_data.mcc = [cellularList objectAtIndex:0];
+                self->data_util.cell_data.mnc = [cellularList objectAtIndex:1];
                 self->data_util.cell_data.NSP = [cellularList objectAtIndex:3];
-                self->data_util.cell_data.cid = [[cellularList objectAtIndex:0] integerValue];
+                self->data_util.cell_data.type = [cellularList objectAtIndex:4];
             }
-            self->data_util.cell_data.rssi = [self getSignalStrength:NO];
+            self->data_util.cell_data.rssi = -1 * (200 - [self getSignalStrength:NO] * 100 / 5);
+            self->data_util.cell_data.rssi = 1;
 
         }
         if (self->reachManager.isReachable == NO) {
             self->data_util.type = NTNone;
         }
     });
-
-//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:kReachabilityChangedNotification object:nil];
 }
+
+//- (void)updateInterfaceWithReachability:(Reachability *)reachability {
+//    NetworkStatus netStatus = [reachability currentReachabilityStatus];
+//    switch (netStatus) {
+//        case NotReachable:
+//            break;
+//        case ReachableViaWiFi:
+//            break;
+//        case ReachableViaWWAN:
+//            break;
+//    }
+//}
+//
+//- (void) reachabilityChanged:(NSNotification *)note {
+//    Reachability* curReach = [note object];
+//    NSParameterAssert([curReach isKindOfClass:[Reachability class]]);
+//    [self updateInterfaceWithReachability:curReach];
+//}
 
 - (void)authorityOthers:(UIViewController *)vc {
     if (!vc) {
@@ -392,12 +453,44 @@
     if (!carrier) {
         carrier = [[carriers allValues] firstObject];
     }
+    
+    NSString *mcc = carrier.mobileCountryCode;
+    NSString *mnc = carrier.mobileNetworkCode;
+//    NSString *
+    
     NSString *CountryCode = carrier.isoCountryCode;
-    NSString *NetworkCode = carrier.mobileNetworkCode;
-    NSString *NetworkCountryCode = carrier.mobileCountryCode;
+//    NSString *NetworkCode = carrier.mobileNetworkCode;
+//    NSString *NetworkCountryCode = carrier.mobileCountryCode;
     NSString *CarrierName = [[NSString stringWithFormat:@"%@" ,carrier.carrierName] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-//    NSString *CellularService = networkInfo.serviceCurrentRadioAccessTechnology;
-    NSArray *carrierArray = [NSArray arrayWithObjects:NetworkCountryCode, CountryCode, NetworkCode, CarrierName, nil];
+    
+    NSNumber *netconnType = [NSNumber numberWithInt:0];
+    NSDictionary *CellularTech = networkInfo.serviceCurrentRadioAccessTechnology;
+    NSString *currentStatus = CellularTech.allValues.firstObject;
+    if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyGPRS"]) {
+        netconnType = [NSNumber numberWithInt:0];
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyEdge"]) {
+//        netconnType = @"2.75G EDGE";
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyWCDMA"]){
+        netconnType = [NSNumber numberWithInt:1];
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyHSDPA"]){
+//        netconnType = @"3.5G HSDPA";
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyHSUPA"]){
+//        netconnType = @"3.5G HSUPA";
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyCDMA1x"]){
+        netconnType = [NSNumber numberWithInt:3];
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyCDMAEVDORev0"]){
+        netconnType = [NSNumber numberWithInt:3];
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyCDMAEVDORevA"]){
+        netconnType = [NSNumber numberWithInt:3];
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyCDMAEVDORevB"]){
+        netconnType = [NSNumber numberWithInt:3];
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyeHRPD"]){
+//        netconnType = @"HRPD";
+    } else if ([currentStatus isEqualToString:@"CTRadioAccessTechnologyLTE"]){
+        netconnType = [NSNumber numberWithInt:2];
+    }
+    
+    NSArray *carrierArray = [NSArray arrayWithObjects:mcc, mnc, CountryCode, CarrierName, netconnType, nil];
     return carrierArray;
 }
 
@@ -510,6 +603,7 @@
     [altManager startRelativeAltitudeUpdatesToQueue:[NSOperationQueue mainQueue] withHandler:^(CMAltitudeData * _Nullable altitudeData, NSError * _Nullable error) {
         self->data_util.sensor_data.pressure = [altitudeData.pressure floatValue];
         self->data_util.sensor_data.height = [altitudeData.relativeAltitude floatValue];
+        [self baroAdd:[NSNumber numberWithFloat:[altitudeData.pressure floatValue]]];
     }];
 }
 
@@ -523,6 +617,7 @@
 
 # pragma mark - Motion Engine
 - (void)initMotionEngine {
+    
     if (!mtManager) {
         mtManager = [[CMMotionManager alloc]init];
     }
@@ -538,6 +633,8 @@
         self->data_util.sensor_data.mx = field.x;
         self->data_util.sensor_data.my = field.y;
         self->data_util.sensor_data.mz = field.z;
+        self->data_util.sensor_data.total = sqrtf(powf(field.x, 2) + powf(field.y, 2) + powf(field.z, 2));
+        [self magAdd:[NSNumber numberWithFloat:self->data_util.sensor_data.total]];
     }];
 }
 
@@ -555,21 +652,18 @@
     if (!healthStore) {
         healthStore = [[HKHealthStore alloc] init];
     }
-
 }
 
 - (void)startHealthKitEngine {
     NSSet *healthSet = [NSSet setWithObjects:
-                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount],
-                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned],
-                        [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning],nil];
+                            [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount],
+                            [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierActiveEnergyBurned],
+                            [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning],nil];
     [healthStore requestAuthorizationToShareTypes:nil readTypes:healthSet completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
-//            NSLog(@"Can get Step Counter");
-            [self fetchSumOfSamplesTodayForType:[HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount] unit:[HKUnit dayUnit] completion:^(double value, NSError *error) {
-                self->data_util.sensor_data.steps = value;
+            [self fetchSumOfSamplesTodayForType:[HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount] unit:HKUnit.countUnit completion:^(double value, NSError *error) {
+                self->data_util.sensor_data.steps =  value;
                 NSLog(@"%@", error.description);
-                [self startNetworkEngine];
             }];
         }
         else {
@@ -630,7 +724,7 @@
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDate *now = [NSDate date];
     NSDate *startDate = [calendar startOfDayForDate:now];
-    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:1 toDate:startDate options:0];
+    NSDate *endDate = [calendar dateByAddingUnit:NSCalendarUnitDay value:60 * 60 * 24 toDate:startDate options:0];
     NSPredicate *pre = [HKQuery predicateForSamplesWithStartDate:startDate endDate:endDate options:HKQueryOptionStrictStartDate];
 
     HKStatisticsQuery *query = [[HKStatisticsQuery alloc] initWithQuantityType:quantityType quantitySamplePredicate:pre options:HKStatisticsOptionSeparateBySource completionHandler:^(HKStatisticsQuery *query, HKStatistics *result, NSError *error) {
@@ -654,5 +748,71 @@
     
     [healthStore executeQuery:query];
 }
+
+#pragma mark - Threadsafe Operations
+- (void)magAdd:(NSObject *)obj {
+    if (!magCache) {
+        magCache = [[ThreadSafeMutableArray alloc]init];
+    }
+    dispatch_async(threadsafe_queue, ^{
+        [self->magCache addObject:obj];
+    });
+}
+
+- (void)magRemoveObject:(NSObject *)obj {
+    if (!magCache) {
+        return;
+    }
+    dispatch_async(threadsafe_queue, ^{
+        if (!obj) {
+            [self->magCache removeAllObjects];
+        } else {
+            NSInteger index = [self->magCache indexOfObject:obj];
+            if(-1 != index) {
+                NSLog(@"[threadsafe] mag Cache remove obj: %ld from %lu",index, [self->magCache count]);
+                [self->magCache removeObjectAtIndex:index];
+            }
+        }
+    });
+}
+
+- (void)baroAdd:(NSObject *)obj {
+    if (!baroCache) {
+        baroCache = [[ThreadSafeMutableArray alloc]init];
+    }
+    dispatch_async(threadsafe_queue, ^{
+        [self->baroCache addObject:obj];
+    });
+}
+
+- (void)baroRemoveObject:(NSObject *)obj {
+    if (!baroCache) {
+        return;
+    }
+    dispatch_async(threadsafe_queue, ^{
+        if (!obj) {
+            [self->baroCache removeAllObjects];
+        } else {
+            NSInteger index = [self->baroCache indexOfObject:obj];
+            if(-1 != index) {
+                NSLog(@"[threadsafe] baro Cache remove obj: %ld from %lu",index, [self->baroCache count]);
+                [self->baroCache removeObjectAtIndex:index];
+            }
+        }
+    });
+}
+
+- (void)getObject:(void(^)(NSObject *))completion AtIndex:(int)index fromThreadSafeArray:(ThreadSafeMutableArray *)safeArr {
+    if (!safeArr) {
+        return;
+    }
+    if (index >= safeArr.count) {
+        return;
+    }
+    dispatch_async(threadsafe_queue, ^{
+        completion([safeArr objectAtIndex:index]);
+    });
+}
+
 
 @end
