@@ -37,6 +37,7 @@
     datacollector = [[DataCollector alloc]init];
     datacollector.delegate = self;
     [datacollector initEngines:self];
+    [datacollector inputProfile:54287123 globalAddr:@"22.312711,114.1691448"]; //Tel + the longitude latitude of your home addr
 }
 
 - (IBAction)startClicked:(id)sender {
@@ -56,7 +57,7 @@
 - (IBAction)queryClicked:(id)sender {
     NSString *id_str = [datacollector phone_App_vendor_ID];
     NSDictionary *paras = [NSDictionary dictionaryWithObjectsAndKeys:
-                           [NSNumber numberWithInt:2333], @"userId",
+                           [NSNumber numberWithInt:1234567], @"userId",
                            id_str, @"devId",
                            nil];
     [[RemoteAccess instance]readFrom:@"http://143.89.145.220:8080/quarloc/client/stateQuery" withParameters:paras success:^(NSData * _Nonnull remoteData) {

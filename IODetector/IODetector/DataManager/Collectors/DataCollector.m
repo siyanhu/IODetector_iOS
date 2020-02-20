@@ -53,6 +53,12 @@
     [self initHealthKitEngine];
 }
 
+- (void)inputProfile:(NSInteger)userId globalAddr:(NSString *)globalAddr {
+    //22.312711,114.1691448
+    data_util.idinfo.user_id = [NSNumber numberWithInteger: userId];
+    data_util.idinfo.gcoor = globalAddr;
+}
+
 - (void)startCollection {
 
     if (!data_util) {
@@ -61,7 +67,6 @@
     data_util.idinfo.user_id = [NSNumber numberWithInt: 2333];
     data_util.idinfo.dev_id = [self phone_App_vendor_ID];
     [self startLocationEngine];
-    //22.312711,114.1691448
     redoTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
         [self startNetworkEngine];
         [self startBarometerEngine];
@@ -219,9 +224,9 @@
 
 #pragma mark - Device Indetification
 - (NSString *)phone_App_vendor_ID {
-    //DE3BC84C-F19B-406E-A402-ECEF0643B622
+    //Test use: DE3BC84C-F19B-406E-A402-ECEF0643B622 (Ivy's personal iPhone XS, app version 2020-02-20-16-57)
     //Uninstall App, Switch Phone will lead to a different vendor id.
-    NSString *strIDFV = [[[UIDevice currentDevice] identifierForVendor] UUIDString]; //0FD77009-C837-4E3B-AD08-FD1B2E9D7F48
+    NSString *strIDFV = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     return strIDFV;
 }
 

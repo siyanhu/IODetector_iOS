@@ -74,9 +74,27 @@ static RemoteAccess *_instance = nil;
 
 - (void)readFrom:(NSString *)remote_link withParameters:(NSDictionary *)parameters success:(void (^)(NSData *remoteData))success failure:(void (^)(NSError *error))failure {
     
-    NSURL *url = [NSURL URLWithString:remote_link];
+    NSString *addPara = [NSString stringWithFormat:@"%@", remote_link];
+    for (int i = 0; i < parameters.allKeys.count; i++) {
+        if (i == 0) {
+            addPara = [NSString stringWithFormat:@"%@?", addPara];
+        }
+        if (i == parameters.allKeys.count - 1) {
+            NSString *key = [parameters.allKeys objectAtIndex:i];
+            id value = [parameters valueForKey:key];
+            addPara = [NSString stringWithFormat:@"%@%@=%@", addPara, key, value];
+            continue;
+        }
+        NSString *key = [parameters.allKeys objectAtIndex:i];
+        id value = [parameters valueForKey:key];
+        addPara = [NSString stringWithFormat:@"%@%@=%@&", addPara, key, value];
+    }
+    NSURL *url = [NSURL URLWithString:addPara];
+    
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-    config.HTTPAdditionalHeaders = parameters;
+    config.HTTPAdditionalHeaders = @{
+        @"Content-Type": @"application/json",
+    };
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
     [request setHTTPMethod:@"GET"];

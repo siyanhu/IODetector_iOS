@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)phone_App_vendor_ID;
 
 - (void)initEngines:(UIViewController *)vc;
+- (void)inputProfile:(NSInteger)userId globalAddr:(NSString *)globalAddr;
 - (void)startCollection;
 - (void)finishCollection;
 
