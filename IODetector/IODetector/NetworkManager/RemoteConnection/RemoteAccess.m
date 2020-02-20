@@ -79,7 +79,7 @@ static RemoteAccess *_instance = nil;
     config.HTTPAdditionalHeaders = parameters;
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:10.0];
-    
+    [request setHTTPMethod:@"GET"];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error) {
             failure(error);

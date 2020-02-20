@@ -62,7 +62,7 @@
     [[RemoteAccess instance]readFrom:@"http://143.89.145.220:8080/quarloc/client/stateQuery" withParameters:paras success:^(NSData * _Nonnull remoteData) {
         [self showQuery: remoteData];
     } failure:^(NSError * _Nonnull error) {
-        
+        NSLog(@"Query Error:%@", error.description);
     }];
 }
 
@@ -99,7 +99,7 @@
 - (void)showQuery:(NSData *)data {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error = nil;
-        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingFragmentsAllowed error:&error];
     if (error) {
             NSLog(@"Parse Error: %@", error.description);
         } else{

@@ -61,7 +61,7 @@
     data_util.idinfo.user_id = [NSNumber numberWithInt: 2333];
     data_util.idinfo.dev_id = [self phone_App_vendor_ID];
     [self startLocationEngine];
-    
+    //22.312711,114.1691448
     redoTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
         [self startNetworkEngine];
         [self startBarometerEngine];
@@ -75,7 +75,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self dataChecking]) {
                 NSMutableDictionary *uploadDict = [NSMutableDictionary dictionary];
-                [uploadDict setValue:[NSNumber numberWithInteger:54287123] forKey:@"userId"];
+                [uploadDict setValue:[NSNumber numberWithInteger:1234567] forKey:@"userId"];
                 [uploadDict setObject:self->data_util.idinfo.dev_id forKey:@"devId"];
                 [uploadDict setObject:[NSString stringWithFormat:@"%@_%@", [NSNumber numberWithInteger:54287123], [self getDataId]] forKey:@"dataId"];
                 [uploadDict setValue:[NSNumber numberWithInt:[[NSDate date] timeIntervalSince1970]] forKey:@"timestamp"];
@@ -137,9 +137,9 @@
                                             self->data_util.wifi_data.mac, @"bssid",
                                             [NSNumber numberWithInteger: self->data_util.wifi_data.rssi], @"rssi",
                                             nil];
-                NSDictionary *nearbyWLANs = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             [NSArray arrayWithObjects:nearbyWLAN, nil], @"list",
-                                             nil];
+//                NSDictionary *nearbyWLANs = [NSDictionary dictionaryWithObjectsAndKeys:
+//                                             [NSArray arrayWithObjects:nearbyWLAN, nil], @"list",
+//                                             nil];
 //                NSDictionary *nearbyMags = [NSDictionary dictionaryWithObjectsAndKeys:
 //                                            [NSArray arrayWithObjects:
 //                                             [NSNumber numberWithFloat:self->data_util.sensor_data.mx], [NSNumber numberWithFloat:self->data_util.sensor_data.my], [NSNumber numberWithFloat:self->data_util.sensor_data.mz], [NSNumber numberWithFloat:0.0], [NSNumber numberWithFloat:0.0], nil], @"values",
@@ -153,7 +153,7 @@
                                              nil];
                 [self baroRemoveObject:nil];
                 NSDictionary *nearby = [NSDictionary dictionaryWithObjectsAndKeys:
-                                        nearbyWLANs, @"wlan",
+                                        //nearbyWLANs, @"wlan",
                                         nearbyMags, @"magnetic",
                                         nearbyBaros, @"baro",
                                         nil];
@@ -219,6 +219,7 @@
 
 #pragma mark - Device Indetification
 - (NSString *)phone_App_vendor_ID {
+    //DE3BC84C-F19B-406E-A402-ECEF0643B622
     //Uninstall App, Switch Phone will lead to a different vendor id.
     NSString *strIDFV = [[[UIDevice currentDevice] identifierForVendor] UUIDString]; //0FD77009-C837-4E3B-AD08-FD1B2E9D7F48
     return strIDFV;
@@ -515,7 +516,7 @@
                 signalStrength = signalStrength == 3 ? 4 : signalStrength;
             } else if (cellularEntry && [[cellularEntry valueForKeyPath:@"isEnabled"] boolValue]) {
                 signalStrength = [[cellularEntry valueForKey:@"displayValue"] intValue];
-                NSLog(@"%d", signalStrength);
+//                NSLog(@"%d", signalStrength);
             }
         }
         return signalStrength;
@@ -663,7 +664,7 @@
         if (success) {
             [self fetchSumOfSamplesTodayForType:[HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierStepCount] unit:HKUnit.countUnit completion:^(double value, NSError *error) {
                 self->data_util.sensor_data.steps =  value;
-                NSLog(@"%@", error.description);
+//                NSLog(@"%@", error.description);
             }];
         }
         else {
@@ -695,7 +696,7 @@
         double steps = 0;
 
         for (HKQuantitySample *result in results) {
-            NSLog(@"bundleIdentifier:%@",result.sourceRevision.source.bundleIdentifier);
+//            NSLog(@"bundleIdentifier:%@",result.sourceRevision.source.bundleIdentifier);
             HKQuantity *quantity = result.quantity;
             HKUnit *heightUnit = [HKUnit countUnit];
             double usersHeight = [quantity doubleValueForUnit:heightUnit];
@@ -714,7 +715,7 @@
     HKQuantityType *stepType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierDistanceWalkingRunning];
     [self fetchSumOfSamplesTodayForType:stepType unit:[HKUnit meterUnit] completion:^(double stepCount, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"Distance：%.f",stepCount);
+//            NSLog(@"Distance：%.f",stepCount);
             
         });
     }];
