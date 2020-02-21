@@ -12,10 +12,12 @@
 
 @interface ViewController () <DataCollectionDelegate, UITextViewDelegate> {
     DataCollector *datacollector;
+    NSString *apiSwitch;
 }
 
 @property (nonatomic, strong) IBOutlet UITextView *detailLabel;
 @property (nonatomic, strong) IBOutlet UIButton *queryButton;
+@property (nonatomic, strong) IBOutlet UIButton *startButton;
 
 @end
 
@@ -33,11 +35,17 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    apiSwitch = @"init";
     self.detailLabel.delegate = self;
     datacollector = [[DataCollector alloc]init];
     datacollector.delegate = self;
     [datacollector initEngines:self];
     [datacollector inputProfile:54287123 globalAddr:@"22.312711,114.1691448"]; //Tel + the longitude latitude of your home addr
+    
+}
+
+- (IBAction)profileClicked:(id)sender {
+    [self submitProfile];
 }
 
 - (IBAction)startClicked:(id)sender {
@@ -73,12 +81,46 @@
     if (error) {
         NSLog(@"Error msg: %@", error.description);
     } else {
-        [[RemoteAccess instance] uploadJSONTo:@"http://143.89.145.220:8080/quarloc/client/report" withContent:jsonData success:^(NSData * _Nonnull response) {
+        NSString *url_str = [NSString stringWithFormat:@"%@/%@", @"http://143.89.145.220:8080/quarloc/client", apiSwitch];
+        if ([apiSwitch isEqualToString:@"init"]) {
+            apiSwitch = @"report";
+        }
+        [[RemoteAccess instance] uploadJSONTo:url_str withContent:jsonData success:^(NSData * _Nonnull response) {
             NSString *json_string = [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding];
             NSLog(@"Success upload: %@", json_string);
             if ([json_string containsString:@"true"]) {
                 [self enableQuery];
             }
+        } failure:^(NSError * _Nonnull error) {
+            
+        }];
+    }
+}
+
+- (void)submitProfile {
+    NSError *error = nil;
+    NSDictionary *content = [NSDictionary dictionaryWithObjectsAndKeys:
+                          @"542871234", @"userId",
+                          [datacollector phone_App_vendor_ID], @"devId",
+                          [NSNumber numberWithDouble: 22.312711], @"spotLatitude",
+                          [NSNumber numberWithDouble: 114.1691448], @"spotLongitude",
+//                          [NSNumber numberWithInteger: 0], @"spotAltitude",
+                          nil];
+    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:content options:NSJSONWritingPrettyPrinted error:&error];
+    if (error) {
+        NSLog(@"Error msg: %@", error.description);
+    } else {
+        NSString *url_str = @"http://143.89.145.220:8080/quarloc/api/user/register";
+        [[RemoteAccess instance] uploadJSONTo:url_str withContent:jsonData success:^(NSData * _Nonnull response) {
+            NSString *json_string = [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding];
+            NSLog(@"Success upload: %@", json_string);
+//            if ([json_string containsString:@"true"]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.startButton setHidden:NO];
+                [self.startButton setUserInteractionEnabled:YES];
+            });
+//            }
         } failure:^(NSError * _Nonnull error) {
             
         }];

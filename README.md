@@ -1,5 +1,7 @@
 # IODetector_iOS
 To run the project, you may need an Apple developer program access.
+## Server API Documentation:
+    https://quarloc.docs.apiary.io/#reference/0/server-api
 ## Prerequisite:
 		1. iOS developer certificate with following signing & capabilities enabled:
 			* Access WiFi information
@@ -8,12 +10,13 @@ To run the project, you may need an Apple developer program access.
 		2. iOS version is 7.0 or above
 		3. Device Orientation: Protrait only
 		4. The iPhone should have sim card
-## You should report your profile to server administration before uploading data. Profile should include:
+## You should report your profile to server administration at the first time of  uploading data. Profile should include:
 	{
 		global longitude, latitude of your home address
 		your device ID (Vendor ID of iPhone)
+          your user id
 	}
-	Once you have reported the device ID, do not delete the app from you phone in case of ID switching.
+	Once you have reported the device ID, do not delete the app from you phone in case of ID switching. Details please check code (function anme: submitprofile).
 
 ## iPhone Data List:
 	1. Offline:
