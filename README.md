@@ -2,6 +2,14 @@
 To run the project, you may need an Apple developer program access.
 ## Server API Documentation:
     https://quarloc.docs.apiary.io/#reference/0/server-api
+    
+## How to use the app
+    1. open the app
+    2. click submit profile
+    3. when "start edititng" shows, click start editing
+    4. when "query" shows, click query
+    5. end editing when you want.
+
 ## Prerequisite:
 		1. iOS developer certificate with following signing & capabilities enabled:
 			* Access WiFi information
