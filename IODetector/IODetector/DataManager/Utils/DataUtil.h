@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "IDUtil.h"
+#import "BleUtil.h"
 #import "WiFiUtil.h"
 #import "CellularUtil.h"
 #import "SensorUtil.h"
@@ -28,6 +29,7 @@ typedef enum NetworkType : NSUInteger {
 
 - (IDUtil *)idinfo;
 
+- (BleUtil *)ble_data;
 - (LocationUtil *)location_data;
 
 - (WiFiUtil *)wifi_data;

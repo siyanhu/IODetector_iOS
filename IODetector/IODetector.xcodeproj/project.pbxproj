@@ -21,6 +21,8 @@
 		9D1CFE0823FAD297007C8F96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0723FAD297007C8F96 /* Foundation.framework */; };
 		9D1CFE0A23FAE0D6007C8F96 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */; };
 		9D1CFE1323FAF4F8007C8F96 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */; };
+		9D7F7784240661B200F03305 /* BleUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F7783240661B200F03305 /* BleUtil.m */; };
+		9D7F77872406639A00F03305 /* AIBBeaconRegionAny.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F77862406639A00F03305 /* AIBBeaconRegionAny.m */; };
 		9D8EE0AD23FB066000319CA2 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */; };
 		9D8EE0AF23FB0AAE00319CA2 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */; };
 		9D8EE0B423FB95CD00319CA2 /* RemoteAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D8EE0B223FB95CD00319CA2 /* RemoteAccess.m */; };
@@ -59,6 +61,10 @@
 		9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IODetector.entitlements; sourceTree = "<group>"; };
 		9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
+		9D7F7782240661B200F03305 /* BleUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleUtil.h; sourceTree = "<group>"; };
+		9D7F7783240661B200F03305 /* BleUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BleUtil.m; sourceTree = "<group>"; };
+		9D7F77852406639A00F03305 /* AIBBeaconRegionAny.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIBBeaconRegionAny.h; sourceTree = "<group>"; };
+		9D7F77862406639A00F03305 /* AIBBeaconRegionAny.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AIBBeaconRegionAny.m; sourceTree = "<group>"; };
 		9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		9D8EE0AE23FB0AAE00319CA2 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		9D8EE0B223FB95CD00319CA2 /* RemoteAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteAccess.m; sourceTree = "<group>"; };
@@ -100,6 +106,8 @@
 		9D1CFDE523FAC819007C8F96 /* Libs */ = {
 			isa = PBXGroup;
 			children = (
+				9D7F77852406639A00F03305 /* AIBBeaconRegionAny.h */,
+				9D7F77862406639A00F03305 /* AIBBeaconRegionAny.m */,
 				9D0158D523FCFD4E003AE4E5 /* ThreadSafeMutableArray.h */,
 				9D0158D423FCFD4E003AE4E5 /* ThreadSafeMutableArray.m */,
 				9D1CFDE623FAC82B007C8F96 /* Reachability.h */,
@@ -115,6 +123,8 @@
 				9D1CFDEB23FACCA7007C8F96 /* DataUtil.m */,
 				9D1CFDED23FACCDB007C8F96 /* IDUtil.h */,
 				9D1CFDEE23FACCDB007C8F96 /* IDUtil.m */,
+				9D7F7782240661B200F03305 /* BleUtil.h */,
+				9D7F7783240661B200F03305 /* BleUtil.m */,
 				9D1CFDF023FACD80007C8F96 /* WiFiUtil.h */,
 				9D1CFDF123FACD80007C8F96 /* WiFiUtil.m */,
 				9D1CFDF323FACE85007C8F96 /* CellularUtil.h */,
@@ -286,6 +296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D7F7784240661B200F03305 /* BleUtil.m in Sources */,
 				9DE23C5223FA8DD1006ABDDF /* ViewController.m in Sources */,
 				9DE23C4C23FA8DD1006ABDDF /* AppDelegate.m in Sources */,
 				9D1CFDEF23FACCDB007C8F96 /* IDUtil.m in Sources */,
@@ -300,6 +311,7 @@
 				9D0158D623FCFD4E003AE4E5 /* ThreadSafeMutableArray.m in Sources */,
 				9D1CFDF223FACD80007C8F96 /* WiFiUtil.m in Sources */,
 				9D1CFE0223FAD24F007C8F96 /* DataCollector.m in Sources */,
+				9D7F77872406639A00F03305 /* AIBBeaconRegionAny.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

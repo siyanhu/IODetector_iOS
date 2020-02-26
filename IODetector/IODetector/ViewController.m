@@ -58,8 +58,8 @@
     NSString *preText = self.detailLabel.text;
     [self.detailLabel setText:[NSString stringWithFormat:@"%@\n%@",preText, @"End Collection"]];
     
-    self.queryButton.hidden = YES;
-    self.queryButton.userInteractionEnabled = NO;
+//    self.queryButton.hidden = YES;
+//    self.queryButton.userInteractionEnabled = NO;
 }
 
 - (IBAction)queryClicked:(id)sender {
@@ -100,10 +100,10 @@
 - (void)submitProfile {
     NSError *error = nil;
     NSDictionary *content = [NSDictionary dictionaryWithObjectsAndKeys:
-                          @"542871234", @"userId",
+                          @"542871235", @"userId",
                           [datacollector phone_App_vendor_ID], @"devId",
-                          [NSNumber numberWithDouble: 22.312711], @"spotLatitude",
-                          [NSNumber numberWithDouble: 114.1691448], @"spotLongitude",
+                          [NSNumber numberWithDouble: 22.335498], @"spotLatitude",
+                          [NSNumber numberWithDouble: 114.263797], @"spotLongitude",
 //                          [NSNumber numberWithInteger: 0], @"spotAltitude",
                           nil];
     

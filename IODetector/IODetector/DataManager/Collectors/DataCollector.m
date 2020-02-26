@@ -11,6 +11,7 @@
 
 #import "Reachability.h"
 #import "ThreadSafeMutableArray.h"
+#import "AIBBeaconRegionAny.h"
 
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import <SystemConfiguration/SystemConfiguration.h>
@@ -27,6 +28,7 @@
 @interface DataCollector () <CLLocationManagerDelegate> {
     NSTimer *redoTimer, *uploadTimer;
     CLLocationManager *locManager;
+    AIBBeaconRegionAny *bleRegion;
     Reachability *reachManager;
     CMMotionManager *mtManager;
     CMAltimeter *altManager;
@@ -34,7 +36,7 @@
     
     DataUtil *data_util;
     UIViewController *currentVC;
-    ThreadSafeMutableArray *magCache, *baroCache;
+    ThreadSafeMutableArray *magCache, *baroCache, *bleCache;
     dispatch_queue_t threadsafe_queue;
 }
 
@@ -157,10 +159,13 @@
                                              [NSArray arrayWithArray:self->baroCache], @"values",
                                              nil];
                 [self baroRemoveObject:nil];
+                NSDictionary *nearbyBle = [NSDictionary dictionaryWithObjectsAndKeys:[NSArray arrayWithArray:self->bleCache], @"list", nil];
+                [self bleRemoveObject:nil];
                 NSDictionary *nearby = [NSDictionary dictionaryWithObjectsAndKeys:
                                         //nearbyWLANs, @"wlan",
                                         nearbyMags, @"magnetic",
                                         nearbyBaros, @"baro",
+                                        nearbyBle, @"beacon",
                                         nil];
                 
                 NSDictionary *activity = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -255,11 +260,14 @@
         locManager.delegate = self;
     }
     [self locationAccess:currentVC];
+    bleRegion = [[AIBBeaconRegionAny alloc] initWithIdentifier:@"Any"];
 }
 
 - (void)startLocationEngine {
     [locManager startUpdatingLocation];
     [locManager startUpdatingHeading];
+    
+    [locManager startRangingBeaconsInRegion:bleRegion];
 }
 
 - (void)endLocationEngine {
@@ -294,6 +302,32 @@
     dispatch_async(dispatch_get_main_queue(), ^{
 //        [self->headings addObject:[NSNumber numberWithFloat:newHeading.magneticHeading]];
     });
+}
+
+- (void)locationManager:(CLLocationManager *)manager didRangeBeacons:(nonnull NSArray<CLBeacon *> *)beacons satisfyingConstraint:(nonnull CLBeaconIdentityConstraint *)beaconConstraint {
+    for (CLBeacon* beacon in beacons) {
+        if (beacon.rssi <= (-1) * 90) {
+            continue;
+        }
+        if (beacon.rssi == 0) {
+            continue;
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            long long currentTS = [[NSDate date] timeIntervalSince1970] * 1000;
+            self->data_util.ble_data.uuid = beacon.UUID.UUIDString;
+            self->data_util.ble_data.major = beacon.major;
+            self->data_util.ble_data.minor = beacon.minor;
+            self->data_util.ble_data.rssi = beacon.rssi;
+            self->data_util.ble_data.timestamp = currentTS;
+            NSDictionary *content = [NSDictionary dictionaryWithObjectsAndKeys:
+                                     self->data_util.ble_data.uuid, @"uuid",
+                                     self->data_util.ble_data.major, @"major",
+                                     self->data_util.ble_data.minor, @"minor",
+                                     [NSNumber numberWithInteger: self->data_util.ble_data.rssi], @"rssi",
+                                     nil];
+            [self bleAdd:content];
+        });
+    }
 }
 
 - (void)locationAccess:(UIViewController *)vc {
@@ -803,6 +837,32 @@
             if(-1 != index) {
                 NSLog(@"[threadsafe] baro Cache remove obj: %ld from %lu",index, [self->baroCache count]);
                 [self->baroCache removeObjectAtIndex:index];
+            }
+        }
+    });
+}
+
+- (void)bleAdd:(NSObject *)obj {
+    if (!bleCache) {
+        bleCache = [[ThreadSafeMutableArray alloc]init];
+    }
+    dispatch_async(threadsafe_queue, ^{
+        [self->bleCache addObject:obj];
+    });
+}
+
+- (void)bleRemoveObject:(NSObject *)obj {
+    if (!bleCache) {
+        return;
+    }
+    dispatch_async(threadsafe_queue, ^{
+        if (!obj) {
+            [self->bleCache removeAllObjects];
+        } else {
+            NSInteger index = [self->bleCache indexOfObject:obj];
+            if(-1 != index) {
+                NSLog(@"[threadsafe] baro Cache remove obj: %ld from %lu",index, [self->bleCache count]);
+                [self->bleCache removeObjectAtIndex:index];
             }
         }
     });

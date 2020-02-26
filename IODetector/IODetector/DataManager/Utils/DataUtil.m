@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) IDUtil *idinfo;
 
+@property (nonatomic, strong) BleUtil *ble_data
 @property (nonatomic, strong) LocationUtil *location_data;
 @property (nonatomic, strong) WiFiUtil *wifi_data;
 @property (nonatomic, strong) CellularUtil *cell_data;
@@ -28,6 +29,13 @@
         _idinfo = [[IDUtil alloc]init];
     }
     return _idinfo;
+}
+
+- (BleUtil *)ble_data {
+    if (!_ble_data) {
+        _ble_data = [[BleUtil alloc]init];
+    }
+    return _ble_data;
 }
 
 - (LocationUtil *)location_data {
