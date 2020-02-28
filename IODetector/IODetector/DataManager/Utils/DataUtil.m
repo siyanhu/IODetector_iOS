@@ -14,7 +14,7 @@
 
 @property (nonatomic, strong) IDUtil *idinfo;
 
-@property (nonatomic, strong) BleUtil *ble_data
+@property (nonatomic, strong) BleUtil *ble_data;
 @property (nonatomic, strong) LocationUtil *location_data;
 @property (nonatomic, strong) WiFiUtil *wifi_data;
 @property (nonatomic, strong) CellularUtil *cell_data;

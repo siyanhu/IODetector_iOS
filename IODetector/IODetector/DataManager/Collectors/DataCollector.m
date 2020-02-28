@@ -183,7 +183,7 @@
                 [self.delegate didUpdateData:uploadDict];
             }
         });
-    }];
+    }]; 
 
 }
 
