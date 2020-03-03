@@ -7,32 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "E7BEFB21-A2FE-4F79-BE43-0F504ED471FF"
+            uuid = "6E9FE8BE-CA81-44D9-85E0-2DA36D4FF1A9"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IODetector/DataManager/Collectors/DataCollector.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "476"
-            endingLineNumber = "476"
-            landmarkName = "-locationManager:didRangeBeacons:inRegion:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "105C3B57-31A8-4210-A50F-9E7F3E2AD321"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "IODetector/DataManager/Collectors/DataCollector.m"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "335"
-            endingLineNumber = "335"
-            landmarkName = "-parseAdvertisementData:"
+            startingLineNumber = "338"
+            endingLineNumber = "338"
+            landmarkName = "-parseAdvertisementData:withRSSI:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

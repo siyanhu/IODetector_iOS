@@ -305,11 +305,11 @@
     if (title == (id)[NSNull null] || title.length == 0) {
         NSLog(@"Name: %@- BLE UUID: %@ with RSSI %ld \n Details: %@", peripheral.name, uuidstr, (long)RSSI.integerValue, advertisementData);
         referencedBT = peripheral;
-        [self parseAdvertisementData:[advertisementData objectForKey:@"kCBAdvDataManufacturerData"]];
+        [self parseAdvertisementData:[advertisementData objectForKey:@"kCBAdvDataManufacturerData"] withRSSI:RSSI.integerValue];
     }
 }
 
-- (void)parseAdvertisementData:(NSData *)data {
+- (void)parseAdvertisementData:(NSData *)data withRSSI:(NSInteger)rssi {
     //AD0:no
     //AD1: have no Length(1Byte), Indicator (1Byte)
     NSData *company2Data = [data subdataWithRange:NSMakeRange(0, 1)];
@@ -330,17 +330,21 @@
     NSString *txHex = [self convertDataToHexStr:txData];
     NSString *contentHex = [self convertDataToHexStr:contentData];
     
-    NSLog(@"%@", [self convertHEXToDecimalStr:contentHex]);
-    NSString *txNew = [NSString stringWithFormat:@"%ld", (long)-1 * (256 - [self convertHEXToDecimalStr:contentHex].integerValue)];
-    NSString *result = [NSString stringWithFormat:@"%@\n\nBLE Scan Result:\nCompany %@%@ = %@%@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nContent %@ = %@.\n",
+    uint8_t txByte;
+    [txData getBytes:&txByte length:1];
+    int32_t txTC = (int8_t)txByte;
+    NSString *txNew = [NSString stringWithFormat:@"%d", txTC];
+ 
+    NSString *result = [NSString stringWithFormat:@"%@\n\nBLE Scan Result:\nCompany %@%@ = %@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nContent %@, \nRSSI: %d.\n",
                     @"Registered BLE UUID: 619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3",
-                    company2Hex, company1Hex, [self convertHEXToDecimalStr:company2Hex], [self convertHEXToDecimalStr:company1Hex],
+                    company1Hex, company2Hex, [self convertHEXToDecimalStr:[NSString stringWithFormat:@"%@%@", company1Hex, company2Hex]],
                     protocolHex, [self convertHEXToDecimalStr:protocolHex],
                     modelHex, [self convertHEXToDecimalStr:modelHex],
                     majorHex, [self convertHEXToDecimalStr:majorHex],
                     minorHex, [self convertHEXToDecimalStr:minorHex],
                     txHex, txNew,
-                    contentHex, [self convertHEXToDecimalStr:contentHex]];
+                    contentHex,
+                    rssi];
     [self.delegate didUpdateBLE:result];
 }
 
