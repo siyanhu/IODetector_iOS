@@ -19,6 +19,9 @@
 @property (nonatomic, strong) IBOutlet UIButton *queryButton;
 @property (nonatomic, strong) IBOutlet UIButton *startButton;
 
+@property (nonatomic, strong) IBOutlet UITextView *bleDetail;
+@property (nonatomic, strong) IBOutlet UIButton *bleButton;
+
 @end
 
 @implementation ViewController
@@ -152,11 +155,23 @@
     });
 }
 
+- (IBAction)bleClicked:(id)sender {
+    [datacollector registerWristBand];
+}
+
 #pragma mark - Delegate
 - (void)didUpdateData:(NSDictionary *)dataDict {
     if (dataDict) {
 //        NSLog(@"%@", dataDict);
         [self uploadData:dataDict];
+    }
+}
+
+- (void)didUpdateBLE:(NSString *)bleDetail {
+    if (bleDetail) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.bleDetail setText:bleDetail];
+        });
     }
 }
 

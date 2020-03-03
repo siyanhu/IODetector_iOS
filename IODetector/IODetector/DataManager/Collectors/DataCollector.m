@@ -17,6 +17,7 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <CoreLocation/CoreLocation.h>
 #import <CoreMotion/CoreMotion.h>
+#import <CoreBluetooth/CoreBluetooth.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <HealthKit/HealthKit.h>
@@ -25,10 +26,12 @@
 #import <arpa/inet.h>
 
 
-@interface DataCollector () <CLLocationManagerDelegate> {
+@interface DataCollector () <CLLocationManagerDelegate, CBCentralManagerDelegate> {
     NSTimer *redoTimer, *uploadTimer;
     CLLocationManager *locManager;
+    CBCentralManager *bthManager;
     AIBBeaconRegionAny *bleRegion;
+//    CLBeaconRegion *bleRegion;
     Reachability *reachManager;
     CMMotionManager *mtManager;
     CMAltimeter *altManager;
@@ -38,6 +41,7 @@
     UIViewController *currentVC;
     ThreadSafeMutableArray *magCache, *baroCache, *bleCache;
     dispatch_queue_t threadsafe_queue;
+    CBPeripheral *referencedBT;
 }
 
 @end
@@ -59,6 +63,14 @@
     //22.312711,114.1691448
     data_util.idinfo.user_id = [NSNumber numberWithInteger: userId];
     data_util.idinfo.gcoor = globalAddr;
+}
+
+- (void)registerWristBand {
+    if (!bthManager) {
+        bthManager = [[CBCentralManager alloc]init];
+        bthManager.delegate = self;
+    }
+   
 }
 
 - (void)startCollection {
@@ -250,6 +262,142 @@
     return DateTime;
 }
 
+#pragma mark - Bluetooth Engine
+- (void)centralManagerDidUpdateState:(CBCentralManager *)central {
+    switch (central.state) {
+        case CBManagerStatePoweredOn:
+             [bthManager scanForPeripheralsWithServices:nil options:@{CBCentralManagerScanOptionAllowDuplicatesKey :@YES}];
+            break;
+        case CBManagerStateUnknown:
+            NSLog(@"Bluetooth Status Unknown");
+            break;
+        case CBManagerStateResetting:
+            NSLog(@"Bluetooth Status resetting");
+            break;
+        case CBManagerStateUnsupported:
+            NSLog(@"Bluetooth Status unsupported");
+            break;
+        case CBManagerStateUnauthorized:
+            NSLog(@"Bluetooth Status unauthorised");
+            break;
+        case CBManagerStatePoweredOff:
+            NSLog(@"Bluetooth Status power off");
+            break;
+        default:
+            NSLog(@"Bluetooth Status error: %ld", central.state);
+            break;
+    }
+}
+
+- (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+}
+
+- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI {
+    NSString *uuidstr = peripheral.identifier.UUIDString;
+    NSString *title = peripheral.name;
+ 
+//    if (![uuidstr isEqualToString:@"2650C178-B268-DE90-AA9C-BACBA2CE5BFF"]) {
+//        return;
+//    }
+    if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
+        return;
+    }
+    if (title == (id)[NSNull null] || title.length == 0) {
+        NSLog(@"Name: %@- BLE UUID: %@ with RSSI %ld \n Details: %@", peripheral.name, uuidstr, (long)RSSI.integerValue, advertisementData);
+        referencedBT = peripheral;
+        [self parseAdvertisementData:[advertisementData objectForKey:@"kCBAdvDataManufacturerData"]];
+    }
+}
+
+- (void)parseAdvertisementData:(NSData *)data {
+    //AD0:no
+    //AD1: have no Length(1Byte), Indicator (1Byte)
+    NSData *company2Data = [data subdataWithRange:NSMakeRange(0, 1)];
+    NSData *company1Data = [data subdataWithRange:NSMakeRange(1, 1)];
+    NSData *protocolData = [data subdataWithRange:NSMakeRange(2, 1)];
+    NSData *modelData = [data subdataWithRange:NSMakeRange(3, 1)];
+    NSData *majorData = [data subdataWithRange:NSMakeRange(4, 2)];
+    NSData *minorData = [data subdataWithRange:NSMakeRange(6, 2)];
+    NSData *txData = [data subdataWithRange:NSMakeRange(8, 1)];
+    NSData *contentData = [data subdataWithRange:NSMakeRange(9, 2)];
+    
+    NSString *company2Hex = [self convertDataToHexStr:company2Data];
+    NSString *company1Hex = [self convertDataToHexStr:company1Data];
+    NSString *protocolHex = [self convertDataToHexStr:protocolData];
+    NSString *modelHex = [self convertDataToHexStr:modelData];
+    NSString *majorHex = [self convertDataToHexStr:majorData];
+    NSString *minorHex = [self convertDataToHexStr:minorData];
+    NSString *txHex = [self convertDataToHexStr:txData];
+    NSString *contentHex = [self convertDataToHexStr:contentData];
+    
+    NSLog(@"%@", [self convertHEXToDecimalStr:contentHex]);
+    NSString *txNew = [NSString stringWithFormat:@"%ld", (long)-1 * (256 - [self convertHEXToDecimalStr:contentHex].integerValue)];
+    NSString *result = [NSString stringWithFormat:@"%@\n\nBLE Scan Result:\nCompany %@%@ = %@%@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nContent %@ = %@.\n",
+                    @"Registered BLE UUID: 619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3",
+                    company2Hex, company1Hex, [self convertHEXToDecimalStr:company2Hex], [self convertHEXToDecimalStr:company1Hex],
+                    protocolHex, [self convertHEXToDecimalStr:protocolHex],
+                    modelHex, [self convertHEXToDecimalStr:modelHex],
+                    majorHex, [self convertHEXToDecimalStr:majorHex],
+                    minorHex, [self convertHEXToDecimalStr:minorHex],
+                    txHex, txNew,
+                    contentHex, [self convertHEXToDecimalStr:contentHex]];
+    [self.delegate didUpdateBLE:result];
+}
+
+- (void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error {
+    NSLog(@"Bluetooth fail: %@", error.description);
+}
+
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
+    if ([referencedBT isEqual:peripheral]) {
+        [bthManager connectPeripheral:peripheral options:nil];
+    }
+}
+
+- (NSString *)convertDataToHexStr:(NSData *)data {
+    if (!data || [data length] == 0) {
+        return @"";
+    }
+    NSMutableString *string = [[NSMutableString alloc] initWithCapacity:[data length]];
+    
+    [data enumerateByteRangesUsingBlock:^(const void *bytes, NSRange byteRange, BOOL *stop) {
+        unsigned char *dataBytes = (unsigned char*)bytes;
+        for (NSInteger i = 0; i < byteRange.length; i++) {
+            NSString *hexStr = [NSString stringWithFormat:@"%x", (dataBytes[i]) & 0xff];
+            if ([hexStr length] == 2) {
+                [string appendString:hexStr];
+            } else {
+                [string appendFormat:@"0%@", hexStr];
+            }
+        }
+    }];
+    
+    return string;
+}
+
+- (NSString *)convertHEXToDecimalStr:(NSString *)Hex {
+    unsigned result = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:Hex];
+
+    [scanner setScanLocation:0];
+    [scanner scanHexInt:&result];
+    NSString *str = [NSString stringWithFormat:@"%d",  result];
+    return str;
+}
+
+- (NSString *)dataToString:(NSData *)data {
+    SignedByte *bytes = (SignedByte *)[data bytes];
+    NSMutableString *string = [[NSMutableString alloc] init];
+    for(int i = 0; i< [data length]; i++) {
+        if (i == 0) {
+            [string appendString:[NSString stringWithFormat:@"%hhu",bytes[i]]];
+        }else {
+            [string appendString:[NSString stringWithFormat:@", %hhu",bytes[i]]];
+        }
+    }
+    return string;
+}
+
 #pragma mark - Location Engine
 - (void)initLocationEngine {
     if (!locManager) {
@@ -261,6 +409,9 @@
     }
     [self locationAccess:currentVC];
     bleRegion = [[AIBBeaconRegionAny alloc] initWithIdentifier:@"Any"];
+//    NSUUID *uuid = [[NSUUID alloc]initWithUUIDString:@"2650C178-B268-DE90-AA9C-BACBA2CE5BFF"];
+//    NSString *identifier = [NSString stringWithFormat:@"org.hkust.mtrec.wherami.%@", uuid];
+//    bleRegion = [[CLBeaconRegion alloc]initWithProximityUUID:uuid identifier:identifier];
 }
 
 - (void)startLocationEngine {
@@ -304,31 +455,74 @@
     });
 }
 
-- (void)locationManager:(CLLocationManager *)manager didRangeBeacons:(nonnull NSArray<CLBeacon *> *)beacons satisfyingConstraint:(nonnull CLBeaconIdentityConstraint *)beaconConstraint {
+- (void)locationManager:(CLLocationManager *)manager rangingBeaconsDidFailForRegion:(CLBeaconRegion *)region withError:(NSError *)error {
+    NSLog(@"Range Error: %@", error.description);
+}
+
+- (void)locationManager:(CLLocationManager *)manager didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)beaconRegion {
     for (CLBeacon* beacon in beacons) {
-        if (beacon.rssi <= (-1) * 90) {
-            continue;
-        }
-        if (beacon.rssi == 0) {
-            continue;
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            long long currentTS = [[NSDate date] timeIntervalSince1970] * 1000;
-            self->data_util.ble_data.uuid = beacon.UUID.UUIDString;
-            self->data_util.ble_data.major = beacon.major;
-            self->data_util.ble_data.minor = beacon.minor;
-            self->data_util.ble_data.rssi = beacon.rssi;
-            self->data_util.ble_data.timestamp = currentTS;
-            NSDictionary *content = [NSDictionary dictionaryWithObjectsAndKeys:
-                                     self->data_util.ble_data.uuid, @"uuid",
-                                     self->data_util.ble_data.major, @"major",
-                                     self->data_util.ble_data.minor, @"minor",
-                                     [NSNumber numberWithInteger: self->data_util.ble_data.rssi], @"rssi",
-                                     nil];
-            [self bleAdd:content];
-        });
+//        NSLog(@"Beacon uuid: %@\nmajor:%ld\nminor:%\ld\n151, 1, 81, 24, 0, 0, 1, 195, 219, 60, 80", beacon.proximityUUID, beacon.major.longValue, beacon.minor.longValue);
+           if (beacon.rssi <= -50) {
+               continue;
+           }
+           if (beacon.rssi == 0) {
+               continue;
+           }
+//            if (![beacon.proximityUUID.UUIDString isEqualToString:@"2650C178-B268-DE90-AA9C-BACBA2CE5BFF"]) {
+//                return;
+//            }
+
+           dispatch_async(dispatch_get_main_queue(), ^{
+               long long currentTS = [[NSDate date] timeIntervalSince1970] * 1000;
+               self->data_util.ble_data.uuid = beacon.proximityUUID.UUIDString;
+               self->data_util.ble_data.major = beacon.major;
+               self->data_util.ble_data.minor = beacon.minor;
+               self->data_util.ble_data.rssi = beacon.rssi;
+               self->data_util.ble_data.timestamp = currentTS;
+               NSDictionary *content = [NSDictionary dictionaryWithObjectsAndKeys:
+                                        self->data_util.ble_data.uuid, @"uuid",
+                                        self->data_util.ble_data.major, @"major",
+                                        self->data_util.ble_data.minor, @"minor",
+                                        [NSNumber numberWithInteger: self->data_util.ble_data.rssi], @"rssi",
+                                        nil];
+               [self bleAdd:content];
+           });
+        
     }
 }
+
+//- (void)locationManager:(CLLocationManager *)manager didRangeBeacons:(nonnull NSArray<CLBeacon *> *)beacons satisfyingConstraint:(nonnull CLBeaconIdentityConstraint *)beaconConstraint  API_AVAILABLE(ios(13.0)){
+//    for (CLBeacon* beacon in beacons) {
+//        if (beacon.rssi <= (-1) * 90) {
+//            continue;
+//        }
+//        if (beacon.rssi == 0) {
+//            continue;
+//        }
+//        if (@available(iOS 13.0, *)) {
+//            if (![beacon.UUID.UUIDString isEqualToString:@"2650C178-B268-DE90-AA9C-BACBA2CE5BFF"]) {
+//                return;
+//            }
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            long long currentTS = [[NSDate date] timeIntervalSince1970] * 1000;
+//            self->data_util.ble_data.uuid = beacon.UUID.UUIDString;
+//            self->data_util.ble_data.major = beacon.major;
+//            self->data_util.ble_data.minor = beacon.minor;
+//            self->data_util.ble_data.rssi = beacon.rssi;
+//            self->data_util.ble_data.timestamp = currentTS;
+//            NSDictionary *content = [NSDictionary dictionaryWithObjectsAndKeys:
+//                                     self->data_util.ble_data.uuid, @"uuid",
+//                                     self->data_util.ble_data.major, @"major",
+//                                     self->data_util.ble_data.minor, @"minor",
+//                                     [NSNumber numberWithInteger: self->data_util.ble_data.rssi], @"rssi",
+//                                     nil];
+//            [self bleAdd:content];
+//        });
+//    }
+//}
 
 - (void)locationAccess:(UIViewController *)vc {
     if (!vc) {

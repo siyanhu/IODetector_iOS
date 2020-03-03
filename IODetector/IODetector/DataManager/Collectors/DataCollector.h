@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @optional
 
 - (void)didUpdateData:(NSDictionary *)dataDict;
+- (void)didUpdateBLE:(NSString *)bleDetail;
 
 @end
 
@@ -27,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)initEngines:(UIViewController *)vc;
 - (void)inputProfile:(NSInteger)userId globalAddr:(NSString *)globalAddr;
+- (void)registerWristBand;
 - (void)startCollection;
 - (void)finishCollection;
 

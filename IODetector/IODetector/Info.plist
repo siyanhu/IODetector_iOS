@@ -32,6 +32,10 @@
 	<string>Always use location settings</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>When in use access approval</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Always open bluetooth</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Use bluetooth when in use</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
