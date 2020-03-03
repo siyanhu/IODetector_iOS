@@ -61,5 +61,7 @@ To run the project, you may need an Apple developer program access.
 	2. According to specifications "HQSS SHS Network Data Specification for Device Partners V0.3", there are two sets of data in each package, AD0 and AD1. iOS cannot detect AD0 but can very well detect AD1.
 	3. Sample code: DataCollector -> "didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI".
 	4. Developer should pay attention that though it is the same Beacon, CoreBluetooth and CoreLocation will scan with different UUIDs. CoreLocation shall use ProximityUUID, while CoreBluetooth shall use UUID.
+	5. txPower: Byte to two complements.
+	6. Company ID: small endian.
 
 
