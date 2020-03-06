@@ -299,7 +299,11 @@
 //    if (![uuidstr isEqualToString:@"2650C178-B268-DE90-AA9C-BACBA2CE5BFF"]) {
 //        return;
 //    }
-    if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
+    // if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
+    //     return;
+    // }
+
+    if (RSSI.integerValue < -35) {
         return;
     }
     if (title == (id)[NSNull null] || title.length == 0) {
