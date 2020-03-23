@@ -298,14 +298,14 @@
 //    if (![uuidstr isEqualToString:@"964348DF-A7D6-3A4E-CA37-9AAE37564131"]) {
 //        return;
 //    }
-    if (![uuidstr isEqualToString:@"C9161687-FCEB-315A-CF01-057CA54007E4"]) {
-        return;
-    }
+//    if (![uuidstr isEqualToString:@"C9161687-FCEB-315A-CF01-057CA54007E4"]) {
+//        return;
+//    }
 //    if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
 //        return;
 //    }
-//    if (RSSI.integerValue < -40)
-//        return;
+    if (RSSI.integerValue < -40)
+        return;
     if (![advertisementData objectForKey:@"kCBAdvDataManufacturerData"])
         return;
     if (title == (id)[NSNull null] || title.length == 0) {
