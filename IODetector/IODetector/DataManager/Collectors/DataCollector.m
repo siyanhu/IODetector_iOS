@@ -26,7 +26,7 @@
 #import <arpa/inet.h>
 
 
-@interface DataCollector () <CLLocationManagerDelegate, CBCentralManagerDelegate> {
+@interface DataCollector () <CLLocationManagerDelegate, CBCentralManagerDelegate, CBPeripheralDelegate> {
     NSTimer *redoTimer, *uploadTimer;
     CLLocationManager *locManager;
     CBCentralManager *bthManager;
@@ -295,23 +295,35 @@
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI {
     NSString *uuidstr = peripheral.identifier.UUIDString;
     NSString *title = peripheral.name;
- 
-//    if (![uuidstr isEqualToString:@"2650C178-B268-DE90-AA9C-BACBA2CE5BFF"]) {
+//    if (![uuidstr isEqualToString:@"964348DF-A7D6-3A4E-CA37-9AAE37564131"]) {
 //        return;
 //    }
-    if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
+    if (![uuidstr isEqualToString:@"C9161687-FCEB-315A-CF01-057CA54007E4"]) {
         return;
     }
+//    if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
+//        return;
+//    }
+//    if (RSSI.integerValue < -40)
+//        return;
+    if (![advertisementData objectForKey:@"kCBAdvDataManufacturerData"])
+        return;
     if (title == (id)[NSNull null] || title.length == 0) {
         NSLog(@"Name: %@- BLE UUID: %@ with RSSI %ld \n Details: %@", peripheral.name, uuidstr, (long)RSSI.integerValue, advertisementData);
         referencedBT = peripheral;
-        [self parseAdvertisementData:[advertisementData objectForKey:@"kCBAdvDataManufacturerData"] withRSSI:RSSI.integerValue];
+        [bthManager connectPeripheral:referencedBT options:nil];
+//        [bthManager stopScan];
+        
+        [self parseAdvertisementData:[advertisementData objectForKey:@"kCBAdvDataManufacturerData"] withRSSI:RSSI.integerValue andUUID:uuidstr];
     }
 }
 
-- (void)parseAdvertisementData:(NSData *)data withRSSI:(NSInteger)rssi {
+- (void)parseAdvertisementData:(NSData *)data withRSSI:(NSInteger)rssi andUUID:(NSString *)uuidStr {
     //AD0:no
     //AD1: have no Length(1Byte), Indicator (1Byte)
+    if (data.length < 11) {
+        return;
+    }
     NSData *company2Data = [data subdataWithRange:NSMakeRange(0, 1)];
     NSData *company1Data = [data subdataWithRange:NSMakeRange(1, 1)];
     NSData *protocolData = [data subdataWithRange:NSMakeRange(2, 1)];
@@ -319,8 +331,6 @@
     NSData *majorData = [data subdataWithRange:NSMakeRange(4, 2)];
     NSData *minorData = [data subdataWithRange:NSMakeRange(6, 2)];
     NSData *txData = [data subdataWithRange:NSMakeRange(8, 1)];
-    NSData *contentData = [data subdataWithRange:NSMakeRange(9, 2)];
-    
     NSString *company2Hex = [self convertDataToHexStr:company2Data];
     NSString *company1Hex = [self convertDataToHexStr:company1Data];
     NSString *protocolHex = [self convertDataToHexStr:protocolData];
@@ -328,23 +338,37 @@
     NSString *majorHex = [self convertDataToHexStr:majorData];
     NSString *minorHex = [self convertDataToHexStr:minorData];
     NSString *txHex = [self convertDataToHexStr:txData];
-    NSString *contentHex = [self convertDataToHexStr:contentData];
     
     uint8_t txByte;
     [txData getBytes:&txByte length:1];
     int32_t txTC = (int8_t)txByte;
     NSString *txNew = [NSString stringWithFormat:@"%d", txTC];
+    
+    NSData *fstContent = [data subdataWithRange:NSMakeRange(9, 1)];
+    NSString *fstRBit = [self OneByte2bit:[fstContent bytes]];
+    NSString *fstBit = [self reverseString:fstRBit];
+    NSData *secContent = [data subdataWithRange:NSMakeRange(10, 1)];
+    NSString *secRBit = [self OneByte2bit:[secContent bytes]];
+    NSString *secBit = [self reverseString:secRBit];
+    NSString *content = [NSString stringWithFormat:@"%@%@", secBit, fstBit];
+    
+    NSString *strapStr = [content substringWithRange:NSMakeRange(5, 1)];
+    NSString *batteryStr = [content substringWithRange:NSMakeRange(8, 7)];
+    long strap = strtol([strapStr UTF8String], NULL, 2);
+    long battery = strtol([batteryStr UTF8String], NULL, 2);
  
-    NSString *result = [NSString stringWithFormat:@"%@\n\nBLE Scan Result:\nCompany %@%@ = %@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nContent %@, \nRSSI: %d.\n",
-                    @"Registered BLE UUID: 619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3",
-                    company1Hex, company2Hex, [self convertHEXToDecimalStr:[NSString stringWithFormat:@"%@%@", company1Hex, company2Hex]],
-                    protocolHex, [self convertHEXToDecimalStr:protocolHex],
-                    modelHex, [self convertHEXToDecimalStr:modelHex],
-                    majorHex, [self convertHEXToDecimalStr:majorHex],
-                    minorHex, [self convertHEXToDecimalStr:minorHex],
-                    txHex, txNew,
-                    contentHex,
-                    rssi];
+    NSString *result = [NSString stringWithFormat:@"%@\nBLE Scan Result:\nCompany %@%@ = %@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nRSSI: %ld\nstrap:%ld\nbattery:%ld",
+                        uuidStr,
+                        company1Hex, company2Hex, [self convertHEXToDecimalStr:[NSString stringWithFormat:@"%@%@", company1Hex, company2Hex]],
+                        protocolHex, [self convertHEXToDecimalStr:protocolHex],
+                        modelHex, [self convertHEXToDecimalStr:modelHex],
+                        majorHex, [self convertHEXToDecimalStr:majorHex],
+                        minorHex, [self convertHEXToDecimalStr:minorHex],
+                        txHex, txNew,
+                        (long)rssi,
+                        strap,
+                        battery];
+    NSLog(@"%@", result);
     [self.delegate didUpdateBLE:result];
 }
 
@@ -353,8 +377,16 @@
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
-    if ([referencedBT isEqual:peripheral]) {
-        [bthManager connectPeripheral:peripheral options:nil];
+//    if ([referencedBT isEqual:peripheral]) {
+//        [bthManager connectPeripheral:peripheral options:nil];
+//    }
+    [referencedBT setDelegate:self];
+    [referencedBT discoverServices:nil];
+}
+
+- (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error {
+    for (CBService *s in peripheral.services) {
+        NSLog(@"Service UUID: %@", s.UUID);
     }
 }
 
@@ -402,6 +434,34 @@
     return string;
 }
 
+- (NSString *)OneByte2bit:(const char *)byte {
+    char n = byte[0];
+    char buffer[9];
+    buffer[8] = 0; //for null
+    int j = 8;
+    while(j > 0) {
+        if(n & 0x01) {
+            buffer[--j] = '1';
+        } else {
+            buffer[--j] = '0';
+        }
+        n >>= 1;
+    }
+    NSString *test = [NSString stringWithUTF8String:buffer];
+    return test;
+}
+
+- (NSString *)reverseString:(NSString *)myString {
+    NSMutableString *reversedString = [NSMutableString string];
+    NSInteger charIndex = [myString length];
+    while (charIndex > 0) {
+        charIndex--;
+        NSRange subStrRange = NSMakeRange(charIndex, 1);
+        [reversedString appendString:[myString substringWithRange:subStrRange]];
+    }
+    return reversedString;
+}
+
 #pragma mark - Location Engine
 - (void)initLocationEngine {
     if (!locManager) {
@@ -422,7 +482,7 @@
     [locManager startUpdatingLocation];
     [locManager startUpdatingHeading];
     
-    [locManager startRangingBeaconsInRegion:bleRegion];
+//    [locManager startRangingBeaconsInRegion:bleRegion];
 }
 
 - (void)endLocationEngine {
