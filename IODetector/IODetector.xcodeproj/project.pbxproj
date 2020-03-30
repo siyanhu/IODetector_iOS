@@ -21,6 +21,7 @@
 		9D1CFE0823FAD297007C8F96 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0723FAD297007C8F96 /* Foundation.framework */; };
 		9D1CFE0A23FAE0D6007C8F96 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */; };
 		9D1CFE1323FAF4F8007C8F96 /* ExternalAccessory.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */; };
+		9D610822242CE7C200BB63F4 /* FileHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D610820242CE7C200BB63F4 /* FileHandler.m */; };
 		9D7F7784240661B200F03305 /* BleUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F7783240661B200F03305 /* BleUtil.m */; };
 		9D7F77872406639A00F03305 /* AIBBeaconRegionAny.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D7F77862406639A00F03305 /* AIBBeaconRegionAny.m */; };
 		9D8EE0AD23FB066000319CA2 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D8EE0AC23FB066000319CA2 /* CoreMotion.framework */; };
@@ -61,6 +62,8 @@
 		9D1CFE0923FAE0D6007C8F96 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		9D1CFE1123FAF4F8007C8F96 /* IODetector.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = IODetector.entitlements; sourceTree = "<group>"; };
 		9D1CFE1223FAF4F8007C8F96 /* ExternalAccessory.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExternalAccessory.framework; path = System/Library/Frameworks/ExternalAccessory.framework; sourceTree = SDKROOT; };
+		9D610820242CE7C200BB63F4 /* FileHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileHandler.m; sourceTree = "<group>"; };
+		9D610821242CE7C200BB63F4 /* FileHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileHandler.h; sourceTree = "<group>"; };
 		9D7F7782240661B200F03305 /* BleUtil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BleUtil.h; sourceTree = "<group>"; };
 		9D7F7783240661B200F03305 /* BleUtil.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BleUtil.m; sourceTree = "<group>"; };
 		9D7F77852406639A00F03305 /* AIBBeaconRegionAny.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AIBBeaconRegionAny.h; sourceTree = "<group>"; };
@@ -146,6 +149,15 @@
 			path = Collectors;
 			sourceTree = "<group>";
 		};
+		9D61081F242CE7C200BB63F4 /* FileManager */ = {
+			isa = PBXGroup;
+			children = (
+				9D610821242CE7C200BB63F4 /* FileHandler.h */,
+				9D610820242CE7C200BB63F4 /* FileHandler.m */,
+			);
+			path = FileManager;
+			sourceTree = "<group>";
+		};
 		9D8EE0B023FB958900319CA2 /* NetworkManager */ = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +216,7 @@
 		9DE23C6623FA8E0B006ABDDF /* DataManager */ = {
 			isa = PBXGroup;
 			children = (
+				9D61081F242CE7C200BB63F4 /* FileManager */,
 				9D1CFDFC23FAD1EE007C8F96 /* Collectors */,
 				9D1CFDE923FACC92007C8F96 /* Utils */,
 				9D1CFDE523FAC819007C8F96 /* Libs */,
@@ -311,6 +324,7 @@
 				9D0158D623FCFD4E003AE4E5 /* ThreadSafeMutableArray.m in Sources */,
 				9D1CFDF223FACD80007C8F96 /* WiFiUtil.m in Sources */,
 				9D1CFE0223FAD24F007C8F96 /* DataCollector.m in Sources */,
+				9D610822242CE7C200BB63F4 /* FileHandler.m in Sources */,
 				9D7F77872406639A00F03305 /* AIBBeaconRegionAny.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

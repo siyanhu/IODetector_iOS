@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "DataCollector.h"
 #import "RemoteAccess.h"
+#import "FileHandler.h"
 
 @interface ViewController () <DataCollectionDelegate, UITextViewDelegate> {
     DataCollector *datacollector;
@@ -173,6 +174,13 @@
             [self.bleDetail setText:bleDetail];
 //            NSString *hold = self.bleDetail.text;
 //            [self.bleDetail setText:[NSString stringWithFormat:@"%@\n%@", hold, bleDetail]];
+
+            BOOL session_init = [[FileHandler instance] createFolder:@"BLERecord" underPath:[[FileHandler instance] documentDirectory]];
+            if (session_init) {
+                NSString *filePath = [[[FileHandler instance] documentDirectory] stringByAppendingString:@"BLERecord"];
+                filePath = [filePath stringByAppendingPathComponent:@"2020-03-26.txt"];
+                [[FileHandler instance] appendText:bleDetail toFile:filePath];
+            }
         });
     }
 }

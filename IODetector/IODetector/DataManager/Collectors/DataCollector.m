@@ -295,17 +295,18 @@
 - (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary<NSString *,id> *)advertisementData RSSI:(NSNumber *)RSSI {
     NSString *uuidstr = peripheral.identifier.UUIDString;
     NSString *title = peripheral.name;
+    
 //    if (![uuidstr isEqualToString:@"964348DF-A7D6-3A4E-CA37-9AAE37564131"]) {
 //        return;
 //    }
-    if (![uuidstr isEqualToString:@"C9161687-FCEB-315A-CF01-057CA54007E4"]) {
-        return;
-    }
-//    if (![uuidstr isEqualToString:@"619356C9-23F2-1BF6-A1EE-1BDFD8CE88C3"]) {
+//    if (![uuidstr isEqualToString:@"C9161687-FCEB-315A-CF01-057CA54007E4"]) {
 //        return;
 //    }
-    if (RSSI.integerValue < -40)
+    if (![uuidstr isEqualToString:@"0FAED8BE-0DBB-EBED-BBB4-E92C12445659"]) {
         return;
+    }
+//    if (RSSI.integerValue < -40)
+//        return;
     if (![advertisementData objectForKey:@"kCBAdvDataManufacturerData"])
         return;
     if (title == (id)[NSNull null] || title.length == 0) {
@@ -352,12 +353,13 @@
     NSString *secBit = [self reverseString:secRBit];
     NSString *content = [NSString stringWithFormat:@"%@%@", secBit, fstBit];
     
+    
     NSString *strapStr = [content substringWithRange:NSMakeRange(5, 1)];
     NSString *batteryStr = [fstRBit substringWithRange:NSMakeRange(1, 7)];
     long strap = strtol([strapStr UTF8String], NULL, 2);
     long battery = strtol([batteryStr UTF8String], NULL, 2);
  
-    NSString *result = [NSString stringWithFormat:@"%@\nBLE Scan Result:\nCompany %@%@ = %@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nRSSI: %ld\nstrap:%ld\nbattery:%ld",
+    NSString *result = [NSString stringWithFormat:@"\n\n%@\nBLE Scan Result:\nCompany %@%@ = %@, \nProtocol %@ = %@, \nModel %@ = %@, \nMajor %@ = %@, \nMinor %@ = %@, \nTx %@ = %@, \nRSSI: %ld\nstrap:%ld\nbattery:%ld",
                         uuidStr,
                         company1Hex, company2Hex, [self convertHEXToDecimalStr:[NSString stringWithFormat:@"%@%@", company1Hex, company2Hex]],
                         protocolHex, [self convertHEXToDecimalStr:protocolHex],
